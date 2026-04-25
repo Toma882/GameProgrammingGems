@@ -23,4 +23,16 @@ public partial class LauncherWindow : Window
     {
         new GameTreeWindow().Show();
     }
+
+    /// <summary>打开有限状态机演示</summary>
+    private void OpenFsmDemo(object sender, RoutedEventArgs e)
+    {
+        new FsmDemoWindow().Show();
+    }
+
+    /// <summary>打开寻路算法对比演示</summary>
+    private void OpenAStarDemo(object sender, RoutedEventArgs e)
+    {
+        new PathfindingDemoWindow().Show();
+    }
 }

@@ -1,0 +1,203 @@
+<Window x:Class="GPGems.DemoApp.PathfindingDemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:p="clr-namespace:GPGems.Visualization.Pathfinding;assembly=GPGems.Visualization"
+        mc:Ignorable="d"
+        Title="寻路算法对比演示" Height="750" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#16213e">
+    <Window.Resources>
+        <Style x:Key="AlgorithmButtonStyle" TargetType="RadioButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Border x:Name="Border" Background="{TemplateBinding Background}"
+                                CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Opacity" Value="0.8"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#e94560"/>
+                                <Setter Property="FontWeight" Value="Bold"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="#533483"/>
+                                <Setter Property="FontWeight" Value="Normal"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- 顶部算法选择栏 -->
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                Background="#0f3460" Margin="5 5 5 0" Padding="15" CornerRadius="5">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="🔬 算法选择: " Foreground="White" FontSize="14" FontWeight="Bold"
+                           VerticalAlignment="Center" Margin="0 0 15 0"/>
+
+                <RadioButton x:Name="AlgoAStar" Content="A*" Foreground="White"
+                             Checked="OnAlgorithmChanged" Margin="0 0 15 0"
+                             FontSize="12" FontWeight="Bold" Background="#e94560" Padding="12 4"
+                             Style="{StaticResource AlgorithmButtonStyle}"/>
+
+                <RadioButton x:Name="AlgoAStarOptimized" Content="A* 优化版" Foreground="White"
+                             Checked="OnAlgorithmChanged" Margin="0 0 15 0"
+                             FontSize="12" FontWeight="Bold" Background="#28a745" Padding="12 4"
+                             Style="{StaticResource AlgorithmButtonStyle}"/>
+
+                <RadioButton x:Name="AlgoDijkstra" Content="Dijkstra" Foreground="White"
+                             Checked="OnAlgorithmChanged" Margin="0 0 15 0"
+                             FontSize="12" Background="#533483" Padding="12 4"
+                             Style="{StaticResource AlgorithmButtonStyle}"/>
+
+                <RadioButton x:Name="AlgoBFS" Content="BFS" Foreground="White"
+                             Checked="OnAlgorithmChanged" Margin="0 0 15 0"
+                             FontSize="12" Background="#533483" Padding="12 4"
+                             Style="{StaticResource AlgorithmButtonStyle}"/>
+
+                <RadioButton x:Name="AlgoDFS" Content="DFS" Foreground="White"
+                             Checked="OnAlgorithmChanged" Margin="0 0 15 0"
+                             FontSize="12" Background="#533483" Padding="12 4"
+                             Style="{StaticResource AlgorithmButtonStyle}"/>
+
+                <RadioButton x:Name="AlgoBestFirst" Content="Best-First" Foreground="White"
+                             Checked="OnAlgorithmChanged" Margin="0 0 15 0"
+                             FontSize="12" Background="#533483" Padding="12 4"
+                             Style="{StaticResource AlgorithmButtonStyle}"/>
+
+                <RadioButton x:Name="AlgoBidirectional" Content="双向 A*" Foreground="White"
+                             Checked="OnAlgorithmChanged"
+                             FontSize="12" FontWeight="Bold" Background="#9c27b0" Padding="12 4"
+                             Style="{StaticResource AlgorithmButtonStyle}"/>
+
+                <TextBlock x:Name="AlgorithmDescText" Text="经典启发式搜索"
+                           Foreground="#a0a0a0" FontSize="11" Margin="20 0 0 0"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 左侧控制面板 -->
+        <Border Grid.Row="1" Grid.Column="0" Background="#0f3460" Margin="5" Padding="15" CornerRadius="5">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="🗺️ 寻路设置" Foreground="White" FontSize="16" FontWeight="Bold" Margin="0 0 0 15"/>
+
+                    <!-- 网格大小 -->
+                    <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">网格大小</TextBlock>
+                    <DockPanel>
+                        <Slider x:Name="GridSizeSlider" Minimum="10" Maximum="50" Value="25"
+                                TickFrequency="5" IsSnapToTickEnabled="True"
+                                DockPanel.Dock="Left" Width="150"
+                                ValueChanged="OnGridSizeChanged"/>
+                        <TextBlock x:Name="GridSizeText" Text="25x25" Foreground="White"
+                                   VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="40"/>
+                    </DockPanel>
+
+                    <!-- 编辑模式 -->
+                    <TextBlock Foreground="#a0a0a0" Margin="0 15 0 5">编辑模式</TextBlock>
+                    <RadioButton x:Name="ModeObstacle" Content="🟦 障碍物" Foreground="White"
+                                 Checked="OnModeChanged"/>
+                    <RadioButton x:Name="ModeStart" Content="🟢 起点" Foreground="White"
+                                 Checked="OnModeChanged" Margin="0 5 0 0"/>
+                    <RadioButton x:Name="ModeGoal" Content="🔴 终点" Foreground="White"
+                                 Checked="OnModeChanged" Margin="0 5 0 0"/>
+
+                    <!-- 操作按钮 -->
+                    <StackPanel Orientation="Horizontal" Margin="0 20 0 10">
+                        <Button x:Name="FindPathBtn" Content="🚀 寻路" Click="OnFindPath"
+                                Padding="10 5" Margin="0 0 5 0"
+                                Background="#e94560" Foreground="White" BorderThickness="0"/>
+                        <Button x:Name="ClearBtn" Content="🗑️ 清除" Click="OnClear"
+                                Padding="10 5" Margin="0 0 5 0"
+                                Background="#0f3460" Foreground="White" BorderBrush="White" BorderThickness="1"/>
+                    </StackPanel>
+
+                    <Button x:Name="RandomObstacleBtn" Content="🎲 随机障碍物" Click="OnRandomObstacle"
+                            Padding="10 5"
+                            Background="#0f3460" Foreground="White" BorderBrush="White" BorderThickness="1"/>
+
+                    <Separator Margin="0 15" Background="#533483"/>
+
+                    <!-- 统计信息 -->
+                    <GroupBox Header="📊 搜索统计" BorderBrush="#533483" Foreground="White" Margin="0 0 0 10">
+                        <StackPanel Margin="5">
+                            <TextBlock x:Name="AlgorithmNameText" Text="当前算法: A*" Foreground="White" FontWeight="Bold"/>
+                            <TextBlock x:Name="OpenSetText" Text="开放集: 0" Foreground="White" Margin="0 3 0 0"/>
+                            <TextBlock x:Name="ClosedSetText" Text="关闭集: 0" Foreground="White" Margin="0 3 0 0"/>
+                            <TextBlock x:Name="PathLengthText" Text="路径长度: 0" Foreground="White" Margin="0 3 0 0"/>
+                            <TextBlock x:Name="UseTimeText" Text="用时: 0" Foreground="White" Margin="0 3 0 0"/>
+                            <TextBlock x:Name="StatusText" Text="就绪" Foreground="#4ecca3" Margin="0 5 0 0"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <Separator Margin="0 15" Background="#533483"/>
+
+                    <!-- 图例 -->
+                    <TextBlock Text="🎨 图例" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0 5"/>
+
+                    <StackPanel Margin="5 0">
+                        <DockPanel Margin="0 3">
+                            <Rectangle Width="16" Height="16" Fill="#4ecca3" Margin="0 0 5 0"/>
+                            <TextBlock Text="起点" Foreground="White"/>
+                        </DockPanel>
+                        <DockPanel Margin="0 3">
+                            <Rectangle Width="16" Height="16" Fill="#e94560" Margin="0 0 5 0"/>
+                            <TextBlock Text="终点" Foreground="White"/>
+                        </DockPanel>
+                        <DockPanel Margin="0 3">
+                            <Rectangle Width="16" Height="16" Fill="#ffc107" Margin="0 0 5 0"/>
+                            <TextBlock Text="路径" Foreground="White"/>
+                        </DockPanel>
+                        <DockPanel Margin="0 3">
+                            <Rectangle Width="16" Height="16" Fill="#4361ee" Margin="0 0 5 0"/>
+                            <TextBlock Text="开放集" Foreground="White"/>
+                        </DockPanel>
+                        <DockPanel Margin="0 3">
+                            <Rectangle Width="16" Height="16" Fill="#533483" Margin="0 0 5 0"/>
+                            <TextBlock Text="关闭集" Foreground="White"/>
+                        </DockPanel>
+                        <DockPanel Margin="0 3">
+                            <Rectangle Width="16" Height="16" Fill="#0f3460" Margin="0 0 5 0"/>
+                            <TextBlock Text="障碍物" Foreground="White"/>
+                        </DockPanel>
+                    </StackPanel>
+
+                    <Separator Margin="0 15" Background="#533483"/>
+
+                    <TextBlock Text="ℹ️ 说明" Foreground="White" FontSize="12" FontWeight="Bold" Margin="0 5"/>
+                    <TextBlock Foreground="#a0a0a0" FontSize="11" TextWrapping="Wrap">
+                        选择不同的寻路算法，观察它们在同一张地图上的表现差异。
+                        切换算法后，点击「寻路」按钮重新运行。
+                    </TextBlock>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 右侧可视化区域 -->
+        <Border Grid.Row="1" Grid.Column="1" Margin="5" Background="#0a192f" CornerRadius="5">
+            <Grid>
+                <TextBlock x:Name="TitleText" Text="寻路算法可视化" Foreground="White"
+                           FontSize="16" FontWeight="Bold"
+                           HorizontalAlignment="Left" VerticalAlignment="Top" Margin="15,10,0,0"/>
+                <p:PathfindingCanvas x:Name="PathCanvas" Margin="15,50,15,15"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

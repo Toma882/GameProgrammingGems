@@ -71,32 +71,32 @@
                     </Grid>
                 </Border>
 
-                <!-- 有限状态机 (Coming Soon) -->
+                <!-- 有限状态机 FSM -->
                 <Border Width="280" Height="200" Margin="10"
                         Background="#16213e" CornerRadius="10"
-                        BorderBrush="#533483" BorderThickness="2"
-                        Opacity="0.6">
+                        BorderBrush="#ffc107" BorderThickness="2">
                     <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenFsmDemo"/>
                         <StackPanel Margin="20" VerticalAlignment="Center">
                             <TextBlock Text="🤖" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
                             <TextBlock Text="有限状态机" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                            <TextBlock Text="FSM / 状态转换" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
-                            <TextBlock Text="Coming Soon" FontSize="10" Foreground="#e94560" HorizontalAlignment="Center" Margin="0 10 0 0" FontWeight="Bold"/>
+                            <TextBlock Text="NPC AI 状态转换" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="巡逻 · 追击 · 攻击" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
                         </StackPanel>
                     </Grid>
                 </Border>
 
-                <!-- A* 寻路 (Coming Soon) -->
+                <!-- A* 寻路 -->
                 <Border Width="280" Height="200" Margin="10"
                         Background="#16213e" CornerRadius="10"
-                        BorderBrush="#533483" BorderThickness="2"
-                        Opacity="0.6">
+                        BorderBrush="#4361ee" BorderThickness="2">
                     <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenAStarDemo"/>
                         <StackPanel Margin="20" VerticalAlignment="Center">
                             <TextBlock Text="🗺️" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
-                            <TextBlock Text="A* 寻路" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                            <TextBlock Text="网格导航 + 启发函数" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
-                            <TextBlock Text="Coming Soon" FontSize="10" Foreground="#e94560" HorizontalAlignment="Center" Margin="0 10 0 0" FontWeight="Bold"/>
+                            <TextBlock Text="寻路算法对比" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="A* / Dijkstra / BFS / DFS" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="同地图多算法对比" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
                         </StackPanel>
                     </Grid>
                 </Border>

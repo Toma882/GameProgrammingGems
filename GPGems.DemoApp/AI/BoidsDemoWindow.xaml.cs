@@ -31,7 +31,7 @@ public partial class BoidsDemoWindow : Window
             Color = RgbColor.FromRgb(233, 69, 96)
         };
 
-        // 应用滑块参数
+        // 先应用设置，再生成 Boids（重要：生成需要 Settings.DesiredSpeed）
         UpdateSettingsFromUI();
 
         // 生成 Boids
@@ -51,9 +51,12 @@ public partial class BoidsDemoWindow : Window
             DesiredSpeed = (float)DesiredSpeedSlider.Value,
             MaxSpeed = (float)MaxSpeedSlider.Value,
             MaxAcceleration = 5f,
-            MinUrgency = 0.02f,
-            MaxUrgency = 0.1f,
-            MaxVisibleFriends = 10
+            MaxVisibleFriends = 30,
+            SeparationWeight = (float)SepWeightSlider.Value,
+            AlignmentWeight = (float)AliWeightSlider.Value,
+            CohesionWeight = (float)CohWeightSlider.Value,
+            CruiseGain = 0.5f,
+            VerticalDamping = 0.98f,
         };
 
         BoidsCanvas.TimeScale = (float)TimeScaleSlider.Value;
@@ -63,6 +66,9 @@ public partial class BoidsDemoWindow : Window
         SeparationText.Text = $"{SeparationSlider.Value:F0}";
         DesiredSpeedText.Text = $"{DesiredSpeedSlider.Value:F0}";
         MaxSpeedText.Text = $"{MaxSpeedSlider.Value:F0}";
+        SepWeightText.Text = $"{SepWeightSlider.Value:F1}";
+        AliWeightText.Text = $"{AliWeightSlider.Value:F1}";
+        CohWeightText.Text = $"{CohWeightSlider.Value:F1}";
         TimeScaleText.Text = $"{TimeScaleSlider.Value:F1}";
     }
 

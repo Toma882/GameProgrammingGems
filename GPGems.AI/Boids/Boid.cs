@@ -13,28 +13,38 @@ namespace GPGems.AI.Boids;
 public record BoidSettings
 {
     /// <summary>感知范围（能看到多远的同伴）</summary>
-    public float PerceptionRange { get; init; } = 25f;
+    public float PerceptionRange { get; init; } = 25.0f;
 
     /// <summary>期望分离距离（与同伴保持的距离）</summary>
-    public float SeparationDist { get; init; } = 8f;
+    public float SeparationDist { get; init; } = 10.0f;
 
     /// <summary>期望巡航速度</summary>
-    public float DesiredSpeed { get; init; } = 15f;
+    public float DesiredSpeed { get; init; } = 2.0f;
 
     /// <summary>最大速度限制</summary>
-    public float MaxSpeed { get; init; } = 25f;
+    public float MaxSpeed { get; init; } = 4.0f;
 
-    /// <summary>最大加速度变化</summary>
-    public float MaxAcceleration { get; init; } = 5f;
-
-    /// <summary>最小紧急程度（用于平滑转向）</summary>
-    public float MinUrgency { get; init; } = 0.02f;
-
-    /// <summary>最大紧急程度</summary>
-    public float MaxUrgency { get; init; } = 0.1f;
+    /// <summary>最大加速度变化（转向力上限）</summary>
+    public float MaxAcceleration { get; init; } = 5.0f;
 
     /// <summary>最大可见同伴数量</summary>
-    public int MaxVisibleFriends { get; init; } = 10;
+    public int MaxVisibleFriends { get; init; } = 30;
+
+    // ---- 三大规则权重 ----
+    /// <summary>分离权重</summary>
+    public float SeparationWeight { get; init; } = 1.5f;
+
+    /// <summary>对齐权重</summary>
+    public float AlignmentWeight { get; init; } = 1.0f;
+
+    /// <summary>凝聚权重</summary>
+    public float CohesionWeight { get; init; } = 1.0f;
+
+    /// <summary>巡航速度调节增益（越大越快调整到期望速度）</summary>
+    public float CruiseGain { get; init; } = 0.5f;
+
+    /// <summary>垂直阻尼（每帧 Y 速度衰减，1.0 = 无阻尼，0.98 = 轻微阻尼）</summary>
+    public float VerticalDamping { get; init; } = 0.98f;
 }
 
 /// <summary>
@@ -73,7 +83,8 @@ public class Boid
     /// <summary>到最近同伴的距离</summary>
     public float NearestFriendDist { get; private set; } = float.PositiveInfinity;
 
-    private static readonly Random Rand = new();
+    // 两阶段更新：Flock 先用 ComputeForces 再统一 Integrate
+    private Vector3 _acceleration;
 
     public Boid(int id, Vector3 initialPosition, Vector3 initialVelocity)
     {
@@ -85,47 +96,37 @@ public class Boid
         OldVelocity = initialVelocity;
     }
 
-    /// <summary>
-    /// 单帧更新：执行群体行为
-    /// Reynolds 三大规则 + 巡航 + 边界处理
-    /// </summary>
-    public void Update(BoidSettings settings, Flock flock, BoundingBox worldBounds)
+    /// <summary>Phase 1: 基于当前状态计算转向力（Flock 两阶段 Update 用）</summary>
+    public void ComputeForces(BoidSettings settings, Flock flock)
     {
-        // 保存上一帧状态
-        OldPosition = Position;
-        OldVelocity = Velocity;
-
-        // Step 1: 感知 - 找出所有可见的同伴
         SeeFriends(flock, settings.PerceptionRange, settings.MaxVisibleFriends);
 
-        Vector3 acceleration = Vector3.Zero;
+        _acceleration = Vector3.Zero;
 
         if (VisibleFriends.Count > 0)
         {
-            // Rule #1: 分离 - 与最近同伴保持距离
-            Accumulate(ref acceleration, KeepDistance(settings));
-
-            // Rule #2: 对齐 - 匹配最近同伴的方向
-            Accumulate(ref acceleration, MatchHeading(settings));
-
-            // Rule #3: 凝聚 - 朝向群体质心移动
-            Accumulate(ref acceleration, SteerToCenter(settings));
+            _acceleration += KeepDistance(settings) * settings.SeparationWeight;
+            _acceleration += MatchHeading(settings) * settings.AlignmentWeight;
+            _acceleration += SteerToCenter(settings) * settings.CohesionWeight;
         }
 
-        // Rule #4: 巡航 - 保持期望速度
-        Accumulate(ref acceleration, Cruise(settings));
+        _acceleration += Cruise(settings);
 
-        // 限制最大加速度
-        if (acceleration.Length() > settings.MaxAcceleration)
-        {
-            acceleration = acceleration.SetMagnitude(settings.MaxAcceleration);
-        }
+        if (_acceleration.Length() > settings.MaxAcceleration)
+            _acceleration = _acceleration.SetMagnitude(settings.MaxAcceleration);
+    }
 
-        // 应用加速度
-        Velocity += acceleration;
+    /// <summary>Phase 2: 应用转向力、更新速度和位置（Flock 两阶段 Update 用）</summary>
+    public void Integrate(BoidSettings settings, BoundingBox worldBounds)
+    {
+        OldVelocity = Velocity;
+        OldPosition = Position;
 
-        // 减弱垂直方向运动，让飞行更自然
-        Velocity = new Vector3(Velocity.X, Velocity.Y * settings.MaxUrgency, Velocity.Z);
+        // 应用转向加速度
+        Velocity += _acceleration;
+
+        // 轻柔垂直阻尼（防止飞散，保留 3D 感）
+        Velocity = new Vector3(Velocity.X, Velocity.Y * settings.VerticalDamping, Velocity.Z);
 
         // 限制最大速度
         Speed = Velocity.Length();
@@ -135,87 +136,112 @@ public class Boid
             Speed = settings.MaxSpeed;
         }
 
-        // 更新位置
+        // 更新位置（Reynolds 标准顺序：先算力 → 更新速度 → 最后更新位置）
         Position += Velocity;
 
-        // 计算朝向（Roll/Pitch/Yaw）
+        // 计算朝向
         ComputeOrientation();
 
-        // 边界处理：循环世界
+        // 边界处理
         WorldBounds(worldBounds);
     }
 
-    /// <summary>Rule #1: 分离 - 与最近同伴保持期望距离</summary>
+    /// <summary>
+    /// 单帧更新（保持向后兼容，但建议 Flock 使用两阶段 ComputeForces + Integrate）
+    /// </summary>
+    public void Update(BoidSettings settings, Flock flock, BoundingBox worldBounds)
+    {
+        ComputeForces(settings, flock);
+        Integrate(settings, worldBounds);
+    }
+
+    /// <summary>Rule #1: 分离 - 与所有可见同伴保持距离</summary>
     private Vector3 KeepDistance(BoidSettings settings)
     {
-        if (NearestFriend == null) return Vector3.Zero;
+        Vector3 steer = Vector3.Zero;
+        int count = 0;
 
-        float ratio = NearestFriendDist / settings.SeparationDist;
-        ratio = Math.Clamp(ratio, settings.MinUrgency, settings.MaxUrgency);
-
-        // 指向同伴的向量
-        Vector3 toFriend = NearestFriend.Position - Position;
-
-        if (NearestFriendDist < settings.SeparationDist)
+        foreach (var other in VisibleFriends)
         {
-            // 太近，远离
-            return toFriend.SetMagnitude(-ratio);
-        }
-        else if (NearestFriendDist > settings.SeparationDist)
-        {
-            // 太远，靠近
-            return toFriend.SetMagnitude(ratio);
+            float dist = Vector3.Distance(Position, other.Position);
+            if (dist > 0 && dist < settings.SeparationDist)
+            {
+                Vector3 diff = Position - other.Position;
+                diff /= dist; // 归一化 + 距离加权
+                steer += diff;
+                count++;
+            }
         }
 
-        return Vector3.Zero; // 距离正好
+        if (count > 0)
+        {
+            steer /= count;
+            return SteerTo(steer, settings);
+        }
+
+        return Vector3.Zero;
     }
 
-    /// <summary>Rule #2: 对齐 - 匹配最近同伴的方向</summary>
+    /// <summary>Rule #2: 对齐 - 匹配所有可见同伴的平均方向</summary>
     private Vector3 MatchHeading(BoidSettings settings)
     {
-        if (NearestFriend == null) return Vector3.Zero;
+        Vector3 avgVel = Vector3.Zero;
+        int count = 0;
 
-        // 复制最近同伴的方向，然后缩放到最小紧急程度
-        return NearestFriend.Velocity.SetMagnitude(settings.MinUrgency);
+        foreach (var other in VisibleFriends)
+        {
+            avgVel += other.Velocity;
+            count++;
+        }
+
+        if (count > 0)
+        {
+            avgVel /= count;
+            return SteerTo(avgVel, settings);
+        }
+
+        return Vector3.Zero;
     }
 
-    /// <summary>Rule #3: 凝聚 - 朝向可见同伴的质心移动</summary>
+    /// <summary>Rule #3: 凝聚 - 朝向所有可见同伴的质心移动</summary>
     private Vector3 SteerToCenter(BoidSettings settings)
     {
         if (VisibleFriends.Count == 0) return Vector3.Zero;
 
-        // 计算感知质心
         Vector3 center = Vector3.Zero;
         foreach (var friend in VisibleFriends)
             center += friend.Position;
         center /= VisibleFriends.Count;
 
-        // 朝向质心的向量
-        Vector3 toCenter = center - Position;
-        return toCenter.SetMagnitude(settings.MinUrgency);
+        Vector3 desired = center - Position;
+        return SteerTo(desired, settings);
     }
 
-    /// <summary>Rule #4: 巡航 - 调整到期望速度</summary>
+    /// <summary>标准 Reynolds 转向力计算</summary>
+    private Vector3 SteerTo(Vector3 target, BoidSettings settings)
+    {
+        float dist = target.Length();
+        if (dist > 0)
+        {
+            Vector3 desired = target.Normalize() * settings.DesiredSpeed;
+            Vector3 steer = desired - Velocity;
+            if (steer.Length() > settings.MaxAcceleration)
+                steer = steer.SetMagnitude(settings.MaxAcceleration);
+            return steer;
+        }
+        return Vector3.Zero;
+    }
+
+    /// <summary>巡航速度调节（比例控制器，调整到期望速度）</summary>
     private Vector3 Cruise(BoidSettings settings)
     {
-        Vector3 change = Velocity;
-        float diff = (Speed - settings.DesiredSpeed) / settings.MaxSpeed;
-        float urgency = MathF.Abs(diff);
-
-        // 限制紧急程度
-        urgency = Math.Clamp(urgency, settings.MinUrgency, settings.MaxUrgency);
-
-        // 添加随机抖动，让群体看起来更生动
-        float jitter = (float)Rand.NextDouble();
-        if (jitter < 0.45f)
-            change += new Vector3(settings.MinUrgency * Math.Sign(diff), 0, 0);
-        else if (jitter < 0.90f)
-            change += new Vector3(0, 0, settings.MinUrgency * Math.Sign(diff));
-        else
-            change += new Vector3(0, settings.MinUrgency * Math.Sign(diff) * 0.5f, 0);
-
-        // 计算需要的速度变化
-        return change.SetMagnitude(urgency * (diff > 0 ? -1 : 1));
+        float speedError = settings.DesiredSpeed - Speed;
+        float correction = Math.Clamp(
+            speedError * settings.CruiseGain,
+            -settings.MaxAcceleration,
+            settings.MaxAcceleration
+        );
+        return Velocity.Normalize() * correction;
     }
 
     /// <summary>感知：找出所有可见的同伴</summary>
@@ -235,7 +261,6 @@ public class Boid
                 if (VisibleFriends.Count < maxVisible)
                     VisibleFriends.Add(boid);
 
-                // 记录最近的同伴
                 if (dist < NearestFriendDist)
                 {
                     NearestFriendDist = dist;
@@ -253,21 +278,16 @@ public class Boid
     {
         if (Speed < 0.1f) return;
 
-        // 横向加速度方向
         Vector3 cross1 = Vector3.Cross(Velocity, Velocity - OldVelocity);
         Vector3 lateralDir = Vector3.Cross(cross1, Velocity).Normalize();
-
-        // 横向加速度大小
         float lateralMag = Vector3.Dot(Velocity - OldVelocity, lateralDir);
 
-        // Roll: 根据横向加速度计算倾斜
+        // Roll: 模拟飞行器倾斜 — 用横向加速度与重力的比值计算倾角
         float roll = lateralMag == 0 ? 0f :
             -MathF.Atan2(9.8f, lateralMag) + MathF.PI / 2f;
 
-        // Pitch: 俯仰角
-        float pitch = -MathF.Atan2(Velocity.Y, MathF.Sqrt(Velocity.Z * Velocity.Z + Velocity.X * Velocity.X));
-
-        // Yaw: 偏航角（水平方向）
+        float pitch = -MathF.Atan2(Velocity.Y,
+            MathF.Sqrt(Velocity.Z * Velocity.Z + Velocity.X * Velocity.X));
         float yaw = MathF.Atan2(Velocity.X, Velocity.Z);
 
         Orientation = new Vector3(pitch, yaw, roll);
@@ -288,12 +308,6 @@ public class Boid
         else if (newPos.Z < bounds.MinZ) newPos = new Vector3(newPos.X, newPos.Y, bounds.MaxZ);
 
         Position = newPos;
-    }
-
-    /// <summary>累加力向量</summary>
-    private static void Accumulate(ref Vector3 accumulator, Vector3 change)
-    {
-        accumulator += change;
     }
 }
 

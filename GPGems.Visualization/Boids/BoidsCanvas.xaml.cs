@@ -72,8 +72,12 @@ public partial class BoidsCanvas : UserControl, IDisposable
     {
         if (_flock == null || !_isRunning) return;
 
-        // 更新物理
-        _flock.Update();
+        // 时间缩放：每帧跳过多帧
+        int steps = Math.Max(1, (int)(TimeScale * 2));
+        for (int i = 0; i < steps; i++)
+        {
+            _flock.Update();
+        }
 
         // 渲染 Boids
         RenderBoids();
@@ -123,40 +127,39 @@ public partial class BoidsCanvas : UserControl, IDisposable
     {
         if (_flock == null || _flock.Boids.Count == 0) return;
 
-        var center = _flock.WorldBounds;
-        float scaleX = (float)ActualWidth / (center.MaxX - center.MinX) * 0.8f;
-        float scaleY = (float)ActualHeight / (center.MaxY - center.MinY) * 0.8f;
-        float scale = Math.Min(scaleX, scaleY);
+        var bounds = _flock.WorldBounds;
+        float worldWidth = bounds.MaxX - bounds.MinX;
+        float worldHeight = bounds.MaxY - bounds.MinY;
 
         float offsetX = (float)ActualWidth / 2;
         float offsetY = (float)ActualHeight / 2;
 
-        // 简单的透视相机参数
-        float cameraDistance = 200f;
+        // 基础缩放：将世界坐标映射到画布（保留80%边距）
+        float scaleX = (float)ActualWidth / worldWidth * 0.8f;
+        float scaleY = (float)ActualHeight / worldHeight * 0.8f;
+        float baseScale = Math.Min(scaleX, scaleY);
+
+        // 弱透视投影：Z轴只影响大小和透明度，不显著改变XY位置
+        // 这样群体分布更清晰，透视只是辅助效果
+        float zRange = bounds.MaxZ - bounds.MinZ;
 
         for (int i = 0; i < _flock.Boids.Count && i < _boidShapes.Count; i++)
         {
             var boid = _flock.Boids[i];
             var pos = boid.Position;
 
-            // 透视投影：越远越小
-            float perspective = cameraDistance / (cameraDistance + pos.Z);
-
-            // 3D 转 2D 坐标
-            float x = pos.X * scale * perspective + offsetX;
-            float y = -pos.Y * scale * perspective + offsetY; // Y 轴翻转
+            // 纯 2D 显示：忽略 Z 轴透视，所有点大小一致
+            float x = pos.X * baseScale + offsetX;
+            float y = -pos.Y * baseScale + offsetY;
 
             // 设置位置
             Canvas.SetLeft(_boidShapes[i], x - 4);
             Canvas.SetTop(_boidShapes[i], y - 4);
 
-            // 距离越远，透明度越高
-            _boidShapes[i].Opacity = Math.Clamp(perspective * 0.5 + 0.3, 0.3, 1.0);
-
-            // 根据速度缩放大小
-            float size = 6 + boid.Speed * 0.1f;
-            _boidShapes[i].Width = size;
-            _boidShapes[i].Height = size;
+            // 统一大小和透明度，60 个点都能看清
+            _boidShapes[i].Opacity = 0.9f;
+            _boidShapes[i].Width = 6 + boid.Speed * 0.1f;
+            _boidShapes[i].Height = 6 + boid.Speed * 0.1f;
         }
     }
 

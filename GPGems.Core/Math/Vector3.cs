@@ -3,7 +3,6 @@
  */
 
 using System;
-using System.Numerics;
 
 namespace GPGems.Core.Math;
 

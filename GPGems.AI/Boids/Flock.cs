@@ -36,7 +36,7 @@ public class Flock
         Id = _nextId++;
 
         // 默认世界大小
-        WorldBounds = new BoundingBox(-100, 100, -50, 50, -100, 100);
+        WorldBounds = new BoundingBox(-50, 50, -50, 50, -50, 50);
     }
 
     /// <summary>创建指定数量的 Boid，随机分布</summary>
@@ -64,14 +64,19 @@ public class Flock
         }
     }
 
-    /// <summary>更新整个群体一帧</summary>
+    /// <summary>更新整个群体一帧（两阶段：先算力，再统一更新位置）</summary>
     public void Update()
     {
-        // 更新每个 Boid
-        // 注意：必须先计算所有力，再统一更新位置（避免顺序依赖）
+        // Phase 1: 所有 Boid 基于当前帧状态计算转向力（互不干扰）
         foreach (var boid in Boids)
         {
-            boid.Update(Settings, this, WorldBounds);
+            boid.ComputeForces(Settings, this);
+        }
+
+        // Phase 2: 所有 Boid 统一应用转向力并更新位置（消除顺序依赖）
+        foreach (var boid in Boids)
+        {
+            boid.Integrate(Settings, WorldBounds);
         }
     }
 

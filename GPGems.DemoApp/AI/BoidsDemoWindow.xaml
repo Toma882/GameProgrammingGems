@@ -34,7 +34,7 @@
                     <!-- 感知范围 -->
                     <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">感知范围</TextBlock>
                     <DockPanel>
-                        <Slider x:Name="PerceptionSlider" Minimum="5" Maximum="100" Value="25"
+                        <Slider x:Name="PerceptionSlider" Minimum="10" Maximum="100" Value="25"
                                 TickFrequency="5"
                                 DockPanel.Dock="Left" Width="150"
                                 ValueChanged="OnSettingChanged"/>
@@ -45,33 +45,66 @@
                     <!-- 分离距离 -->
                     <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">分离距离</TextBlock>
                     <DockPanel>
-                        <Slider x:Name="SeparationSlider" Minimum="2" Maximum="30" Value="8"
+                        <Slider x:Name="SeparationSlider" Minimum="5" Maximum="50" Value="10"
                                 TickFrequency="1"
                                 DockPanel.Dock="Left" Width="150"
                                 ValueChanged="OnSettingChanged"/>
-                        <TextBlock x:Name="SeparationText" Text="8" Foreground="White"
+                        <TextBlock x:Name="SeparationText" Text="10" Foreground="White"
                                    VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
                     </DockPanel>
 
                     <!-- 期望速度 -->
                     <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">期望速度</TextBlock>
                     <DockPanel>
-                        <Slider x:Name="DesiredSpeedSlider" Minimum="5" Maximum="50" Value="15"
-                                TickFrequency="1"
+                        <Slider x:Name="DesiredSpeedSlider" Minimum="1" Maximum="10" Value="2"
+                                TickFrequency="0.5"
                                 DockPanel.Dock="Left" Width="150"
                                 ValueChanged="OnSettingChanged"/>
-                        <TextBlock x:Name="DesiredSpeedText" Text="15" Foreground="White"
+                        <TextBlock x:Name="DesiredSpeedText" Text="2" Foreground="White"
                                    VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
                     </DockPanel>
 
                     <!-- 最大速度 -->
                     <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">最大速度</TextBlock>
                     <DockPanel>
-                        <Slider x:Name="MaxSpeedSlider" Minimum="10" Maximum="80" Value="25"
-                                TickFrequency="5"
+                        <Slider x:Name="MaxSpeedSlider" Minimum="2" Maximum="20" Value="4"
+                                TickFrequency="1"
                                 DockPanel.Dock="Left" Width="150"
                                 ValueChanged="OnSettingChanged"/>
-                        <TextBlock x:Name="MaxSpeedText" Text="25" Foreground="White"
+                        <TextBlock x:Name="MaxSpeedText" Text="4" Foreground="White"
+                                   VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
+                    </DockPanel>
+
+                    <!-- 分离权重 -->
+                    <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">分离权重</TextBlock>
+                    <DockPanel>
+                        <Slider x:Name="SepWeightSlider" Minimum="0" Maximum="5" Value="1.5"
+                                TickFrequency="0.1"
+                                DockPanel.Dock="Left" Width="150"
+                                ValueChanged="OnSettingChanged"/>
+                        <TextBlock x:Name="SepWeightText" Text="1.5" Foreground="White"
+                                   VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
+                    </DockPanel>
+
+                    <!-- 对齐权重 -->
+                    <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">对齐权重</TextBlock>
+                    <DockPanel>
+                        <Slider x:Name="AliWeightSlider" Minimum="0" Maximum="5" Value="1.0"
+                                TickFrequency="0.1"
+                                DockPanel.Dock="Left" Width="150"
+                                ValueChanged="OnSettingChanged"/>
+                        <TextBlock x:Name="AliWeightText" Text="1.0" Foreground="White"
+                                   VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
+                    </DockPanel>
+
+                    <!-- 凝聚权重 -->
+                    <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">凝聚权重</TextBlock>
+                    <DockPanel>
+                        <Slider x:Name="CohWeightSlider" Minimum="0" Maximum="5" Value="1.0"
+                                TickFrequency="0.1"
+                                DockPanel.Dock="Left" Width="150"
+                                ValueChanged="OnSettingChanged"/>
+                        <TextBlock x:Name="CohWeightText" Text="1.0" Foreground="White"
                                    VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
                     </DockPanel>
 

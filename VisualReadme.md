@@ -15,3 +15,9 @@ dotnet add package CommunityToolkit.Mvvm  # MVVM框架，可选但推荐
 dotnet new avalonia.app -n GameTreeAvalonia
 cd GameTreeAvalonia
 dotnet add package ScottPlot.Avalonia
+
+
+
+# 运行
+cd D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI
+dotnet run
