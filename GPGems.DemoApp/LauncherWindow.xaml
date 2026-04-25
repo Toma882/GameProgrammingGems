@@ -71,20 +71,7 @@
                     </Grid>
                 </Border>
 
-                <!-- 有限状态机 FSM -->
-                <Border Width="280" Height="200" Margin="10"
-                        Background="#16213e" CornerRadius="10"
-                        BorderBrush="#ffc107" BorderThickness="2">
-                    <Grid>
-                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenFsmDemo"/>
-                        <StackPanel Margin="20" VerticalAlignment="Center">
-                            <TextBlock Text="🤖" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
-                            <TextBlock Text="有限状态机" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
-                            <TextBlock Text="NPC AI 状态转换" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
-                            <TextBlock Text="巡逻 · 追击 · 攻击" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
-                        </StackPanel>
-                    </Grid>
-                </Border>
+    
 
                 <!-- A* 寻路 -->
                 <Border Width="280" Height="200" Margin="10"
@@ -112,6 +99,21 @@
                             <TextBlock Text="Steering 定向行为" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
                             <TextBlock Text="Seek / Flee / Arrive / Wander" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
                             <TextBlock Text="Pursue / Evade 轨迹对比" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 融合决策系统 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#f39c12" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenDecisionSystemDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="🧠" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="NPC 日常生活" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="FSM + 模糊 + 效用 + GOAP" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="起床/通勤/工作/摸鱼/睡觉" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
                         </StackPanel>
                     </Grid>
                 </Border>

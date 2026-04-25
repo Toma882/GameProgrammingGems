@@ -1,0 +1,15 @@
+<Window x:Class="GPGems.DemoApp.DecisionSystemDemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ds="clr-namespace:GPGems.Visualization.DecisionSystem;assembly=GPGems.Visualization"
+        mc:Ignorable="d"
+        Title="NPC 日常作息 - FSM + 行为树 + 模糊逻辑 + 效用系统 + GOAP"
+        Height="900" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#0f0f23">
+    <Grid>
+        <ds:DecisionSystemCanvas />
+    </Grid>
+</Window>
