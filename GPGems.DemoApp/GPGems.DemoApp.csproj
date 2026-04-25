@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\GPGems.Core\GPGems.Core.csproj" />
+    <ProjectReference Include="..\GPGems.AI\GPGems.AI.csproj" />
+    <ProjectReference Include="..\GPGems.GeneralProgramming\GPGems.GeneralProgramming.csproj" />
+    <ProjectReference Include="..\GPGems.MathPhysics\GPGems.MathPhysics.csproj" />
+    <ProjectReference Include="..\GPGems.Graphics\GPGems.Graphics.csproj" />
+    <ProjectReference Include="..\GPGems.Visualization\GPGems.Visualization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <PackageReference Include="ScottPlot.WPF" Version="5.1.58" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+</Project>

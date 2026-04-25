@@ -1,0 +1,16 @@
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\bin\Debug\net9.0\GPGems.MathPhysics.deps.json
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\bin\Debug\net9.0\GPGems.MathPhysics.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\bin\Debug\net9.0\GPGems.MathPhysics.pdb
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\bin\Debug\net9.0\GPGems.Core.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\bin\Debug\net9.0\GPGems.Core.pdb
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\GPGems.MathPhysics.csproj.AssemblyReference.cache
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\GPGems.MathPhysics.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\GPGems.MathPhysics.AssemblyInfoInputs.cache
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\GPGems.MathPhysics.AssemblyInfo.cs
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\GPGems.MathPhysics.csproj.CoreCompileInputs.cache
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\GPGems.MathPhysics.sourcelink.json
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\GPGems.M.EBBA62EA.Up2Date
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\GPGems.MathPhysics.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\refint\GPGems.MathPhysics.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\GPGems.MathPhysics.pdb
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.MathPhysics\obj\Debug\net9.0\ref\GPGems.MathPhysics.dll

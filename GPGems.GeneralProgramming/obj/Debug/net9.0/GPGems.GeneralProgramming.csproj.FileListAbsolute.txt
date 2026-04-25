@@ -1,0 +1,16 @@
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\bin\Debug\net9.0\GPGems.GeneralProgramming.deps.json
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\bin\Debug\net9.0\GPGems.GeneralProgramming.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\bin\Debug\net9.0\GPGems.GeneralProgramming.pdb
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\bin\Debug\net9.0\GPGems.Core.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\bin\Debug\net9.0\GPGems.Core.pdb
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\GPGems.GeneralProgramming.csproj.AssemblyReference.cache
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\GPGems.GeneralProgramming.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\GPGems.GeneralProgramming.AssemblyInfoInputs.cache
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\GPGems.GeneralProgramming.AssemblyInfo.cs
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\GPGems.GeneralProgramming.csproj.CoreCompileInputs.cache
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\GPGems.GeneralProgramming.sourcelink.json
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\GPGems.G.76738B8E.Up2Date
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\GPGems.GeneralProgramming.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\refint\GPGems.GeneralProgramming.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\GPGems.GeneralProgramming.pdb
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.GeneralProgramming\obj\Debug\net9.0\ref\GPGems.GeneralProgramming.dll

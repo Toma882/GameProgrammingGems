@@ -1,0 +1,16 @@
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\GPGems.AI.csproj.AssemblyReference.cache
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\GPGems.AI.GeneratedMSBuildEditorConfig.editorconfig
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\GPGems.AI.AssemblyInfoInputs.cache
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\GPGems.AI.AssemblyInfo.cs
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\GPGems.AI.csproj.CoreCompileInputs.cache
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\GPGems.AI.sourcelink.json
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\bin\Debug\net9.0\GPGems.AI.deps.json
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\bin\Debug\net9.0\GPGems.AI.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\bin\Debug\net9.0\GPGems.AI.pdb
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\bin\Debug\net9.0\GPGems.Core.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\bin\Debug\net9.0\GPGems.Core.pdb
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\GPGems.AI.csproj.Up2Date
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\GPGems.AI.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\refint\GPGems.AI.dll
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\GPGems.AI.pdb
+D:\Project_Git@SVN\GameProgrammingGems\GPGems.AI\obj\Debug\net9.0\ref\GPGems.AI.dll
