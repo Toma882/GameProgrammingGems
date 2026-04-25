@@ -44,6 +44,7 @@ public partial class PathfindingDemoWindow : Window
             _algorithms.Add(AlgoDFS, new DFSPathfinder());
             _algorithms.Add(AlgoBestFirst, new BestFirstPathfinder());
             _algorithms.Add(AlgoBidirectional, new BidirectionalAStarPathfinder());
+            _algorithms.Add(AlgoParallelBidirectional, new ParallelBidirectionalAStarPathfinder());
 
             // 初始化地图
             InitializeMap();

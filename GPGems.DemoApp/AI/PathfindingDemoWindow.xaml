@@ -83,8 +83,13 @@
                              Style="{StaticResource AlgorithmButtonStyle}"/>
 
                 <RadioButton x:Name="AlgoBidirectional" Content="双向 A*" Foreground="White"
+                             Checked="OnAlgorithmChanged" Margin="0 0 15 0"
+                             FontSize="12" Background="#9c27b0" Padding="12 4"
+                             Style="{StaticResource AlgorithmButtonStyle}"/>
+
+                <RadioButton x:Name="AlgoParallelBidirectional" Content="并行双向 A*" Foreground="White"
                              Checked="OnAlgorithmChanged"
-                             FontSize="12" FontWeight="Bold" Background="#9c27b0" Padding="12 4"
+                             FontSize="12" FontWeight="Bold" Background="#e91e63" Padding="12 4"
                              Style="{StaticResource AlgorithmButtonStyle}"/>
 
                 <TextBlock x:Name="AlgorithmDescText" Text="经典启发式搜索"

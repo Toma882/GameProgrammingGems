@@ -64,14 +64,15 @@ public partial class PathfindingCanvas : UserControl
     /// <summary>执行寻路并返回路径</summary>
     public List<GridNode>? FindPath()
     {
-        float beginTime = TimeOnly.FromDateTime(DateTime.Now).Microsecond;
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         _useTime = 0f;
         if (_map == null || _startNode == null || _goalNode == null || _pathfinder == null)
             return null;
 
         _map.ResetPathfinding();
         var path = _pathfinder.FindPath(_map, _startNode, _goalNode);
-        _useTime = TimeOnly.FromDateTime(DateTime.Now).Microsecond - beginTime;
+        _useTime = (float)stopwatch.Elapsed.TotalMilliseconds;
+        stopwatch.Stop();
         
         Render();
         return path.Count > 0 ? path : null;
