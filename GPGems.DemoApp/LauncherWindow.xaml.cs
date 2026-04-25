@@ -35,4 +35,10 @@ public partial class LauncherWindow : Window
     {
         new PathfindingDemoWindow().Show();
     }
+
+    /// <summary>打开 Steering 定向行为演示</summary>
+    private void OpenSteeringDemo(object sender, RoutedEventArgs e)
+    {
+        new SteeringDemoWindow().Show();
+    }
 }

@@ -129,27 +129,89 @@
                                 Background="#0f3460" Foreground="White" BorderBrush="White" BorderThickness="1"/>
                     </StackPanel>
 
+                    <!-- 目标吸引权重 -->
+                    <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">目标吸引权重</TextBlock>
+                    <DockPanel>
+                        <Slider x:Name="SeekWeightSlider" Minimum="0" Maximum="5" Value="0"
+                                TickFrequency="0.1"
+                                DockPanel.Dock="Left" Width="150"
+                                ValueChanged="OnSettingChanged"/>
+                        <TextBlock x:Name="SeekWeightText" Text="0" Foreground="White"
+                                   VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
+                    </DockPanel>
+
+                    <!-- 躲避权重 -->
+                    <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">躲避权重</TextBlock>
+                    <DockPanel>
+                        <Slider x:Name="EvadeWeightSlider" Minimum="0" Maximum="5" Value="2"
+                                TickFrequency="0.1"
+                                DockPanel.Dock="Left" Width="150"
+                                ValueChanged="OnSettingChanged"/>
+                        <TextBlock x:Name="EvadeWeightText" Text="2" Foreground="White"
+                                   VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
+                    </DockPanel>
+
+                    <!-- 领导者跟随权重 -->
+                    <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">领导者跟随权重</TextBlock>
+                    <DockPanel>
+                        <Slider x:Name="LeaderWeightSlider" Minimum="0" Maximum="5" Value="1.2"
+                                TickFrequency="0.1"
+                                DockPanel.Dock="Left" Width="150"
+                                ValueChanged="OnSettingChanged"/>
+                        <TextBlock x:Name="LeaderWeightText" Text="1.2" Foreground="White"
+                                   VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
+                    </DockPanel>
+
+                    <!-- 漫游权重 -->
+                    <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">漫游权重</TextBlock>
+                    <DockPanel>
+                        <Slider x:Name="WanderWeightSlider" Minimum="0" Maximum="2" Value="0.3"
+                                TickFrequency="0.1"
+                                DockPanel.Dock="Left" Width="150"
+                                ValueChanged="OnSettingChanged"/>
+                        <TextBlock x:Name="WanderWeightText" Text="0.3" Foreground="White"
+                                   VerticalAlignment="Center" Margin="10 0 0 0" MinWidth="30"/>
+                    </DockPanel>
+
+                    <!-- 功能开关 -->
+                    <TextBlock Text="⚡ 行为模式" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0 15 0 5"/>
+
+                    <CheckBox x:Name="LeaderModeCheck" Content="领导者模式"
+                              Foreground="White" Margin="0 5"
+                              Checked="OnLeaderModeChanged" Unchecked="OnLeaderModeChanged"/>
+
+                    <CheckBox x:Name="PredatorPreyCheck" Content="捕食者-猎物模式"
+                              Foreground="White" Margin="0 5"
+                              Checked="OnPredatorPreyChanged" Unchecked="OnPredatorPreyChanged"/>
+
+                    <TextBlock Text="🖱️ 鼠标点击画布设置目标点" Foreground="#4ecca3" FontSize="11" Margin="0 10"/>
+
                     <Separator Margin="0 10" Background="#533483"/>
 
-                    <TextBlock Text="📖 三大规则" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0 5"/>
+                    <TextBlock Text="📖 行为规则" Foreground="White" FontSize="14" FontWeight="Bold" Margin="0 5"/>
 
-                    <TextBlock Foreground="#a0a0a0" Margin="0 5" TextWrapping="Wrap">
-                        <Run Foreground="#e94560">1. 分离</Run>: 与邻近个体保持距离，避免碰撞
+                    <TextBlock Foreground="#a0a0a0" Margin="0 3" TextWrapping="Wrap">
+                        <Run Foreground="#e94560">分离</Run> / <Run Foreground="#4ecca3">对齐</Run> / <Run Foreground="#e94560">凝聚</Run>
                     </TextBlock>
-                    <TextBlock Foreground="#a0a0a0" Margin="0 5" TextWrapping="Wrap">
-                        <Run Foreground="#4ecca3">2. 对齐</Run>: 与邻近个体保持相同方向
+                    <TextBlock Foreground="#a0a0a0" Margin="0 3" TextWrapping="Wrap">
+                        <Run Foreground="#ffd93d">🎯 目标吸引</Run>: 向点击位置移动
                     </TextBlock>
-                    <TextBlock Foreground="#a0a0a0" Margin="0 5" TextWrapping="Wrap">
-                        <Run Foreground="#e94560">3. 凝聚</Run>: 向邻近个体的质心靠拢
+                    <TextBlock Foreground="#a0a0a0" Margin="0 3" TextWrapping="Wrap">
+                        <Run Foreground="#ff6b6b">⚔️ 躲避</Run>: 逃离敌人群体
+                    </TextBlock>
+                    <TextBlock Foreground="#a0a0a0" Margin="0 3" TextWrapping="Wrap">
+                        <Run Foreground="#6c5ce7">👑 领导者</Run>: 跟随指定领导者
+                    </TextBlock>
+                    <TextBlock Foreground="#a0a0a0" Margin="0 3" TextWrapping="Wrap">
+                        <Run Foreground="#a29bfe">🐰 漫游</Run>: 无目标时随机移动
                     </TextBlock>
 
                     <Separator Margin="0 10" Background="#533483"/>
 
                     <TextBlock Text="ℹ️ 说明" Foreground="White" FontSize="12" FontWeight="Bold" Margin="0 5"/>
                     <TextBlock Foreground="#a0a0a0" FontSize="11" TextWrapping="Wrap">
-                        调节左侧参数观察群体行为的变化。
-                        增大感知范围会让群体更连贯，
-                        增加分离距离会让个体更分散。
+                        调节参数观察群体行为。点击画布吸引群体，
+                        开启捕食者模式观察两群体追逐效果。
                     </TextBlock>
                 </StackPanel>
             </ScrollViewer>

@@ -28,6 +28,12 @@ public class Flock
     /// <summary>群体行为参数</summary>
     public BoidSettings Settings { get; set; } = new();
 
+    /// <summary>敌人群体列表（用于躲避行为）</summary>
+    public List<Flock>? EnemyFlocks { get; set; }
+
+    /// <summary>群体目标点（所有Boid都会向这个点移动）</summary>
+    public Vector3? GroupTarget { get; set; }
+
     private static int _nextId = 0;
     private static readonly Random Rand = new();
 
@@ -67,6 +73,15 @@ public class Flock
     /// <summary>更新整个群体一帧（两阶段：先算力，再统一更新位置）</summary>
     public void Update()
     {
+        // 同步群体目标到所有Boid
+        if (GroupTarget.HasValue)
+        {
+            foreach (var boid in Boids)
+            {
+                boid.TargetPosition = GroupTarget;
+            }
+        }
+
         // Phase 1: 所有 Boid 基于当前帧状态计算转向力（互不干扰）
         foreach (var boid in Boids)
         {
@@ -109,6 +124,44 @@ public class Flock
         Boids.Clear();
         if (count > 0)
             SpawnBoids(count);
+    }
+
+    /// <summary>设置领导者模式</summary>
+    /// <param name="leaderIndex">领导者索引（-1表示随机选一个）</param>
+    public void SetLeader(int leaderIndex = -1)
+    {
+        if (Boids.Count == 0) return;
+
+        // 清除旧的领导者标记
+        foreach (var boid in Boids)
+        {
+            boid.IsLeader = false;
+            boid.Leader = null;
+        }
+
+        // 选择领导者
+        int index = leaderIndex >= 0 ? leaderIndex : Rand.Next(Boids.Count);
+        var leader = Boids[index];
+        leader.IsLeader = true;
+
+        // 其他Boid设置跟随
+        foreach (var boid in Boids)
+        {
+            if (boid != leader)
+            {
+                boid.Leader = leader;
+            }
+        }
+    }
+
+    /// <summary>清除领导者模式（恢复自由群体）</summary>
+    public void ClearLeader()
+    {
+        foreach (var boid in Boids)
+        {
+            boid.IsLeader = false;
+            boid.Leader = null;
+        }
     }
 
     private static float RandomRange(float min, float max)

@@ -40,11 +40,30 @@ public record BoidSettings
     /// <summary>凝聚权重</summary>
     public float CohesionWeight { get; init; } = 1.0f;
 
+    // ---- 扩展行为权重 ----
+    /// <summary>躲避权重（避开敌人）</summary>
+    public float EvadeWeight { get; init; } = 2.0f;
+
+    /// <summary>目标吸引权重</summary>
+    public float SeekTargetWeight { get; init; } = 0.5f;
+
+    /// <summary>领导者跟随权重</summary>
+    public float FollowLeaderWeight { get; init; } = 1.2f;
+
+    /// <summary>漫游权重（无目标时随机移动）</summary>
+    public float WanderWeight { get; init; } = 0.3f;
+
     /// <summary>巡航速度调节增益（越大越快调整到期望速度）</summary>
     public float CruiseGain { get; init; } = 0.5f;
 
     /// <summary>垂直阻尼（每帧 Y 速度衰减，1.0 = 无阻尼，0.98 = 轻微阻尼）</summary>
     public float VerticalDamping { get; init; } = 0.98f;
+
+    /// <summary>躲避的恐慌半径</summary>
+    public float EvadePanicRadius { get; init; } = 20f;
+
+    /// <summary>目标到达减速半径</summary>
+    public float ArriveSlowingRadius { get; init; } = 15f;
 }
 
 /// <summary>
@@ -77,14 +96,30 @@ public class Boid
     /// <summary>可见的同伴列表</summary>
     public List<Boid> VisibleFriends { get; } = [];
 
+    /// <summary>可见的敌人列表（其他群体的成员）</summary>
+    public List<Boid> VisibleEnemies { get; } = [];
+
     /// <summary>最近的同伴</summary>
     public Boid? NearestFriend { get; private set; }
 
     /// <summary>到最近同伴的距离</summary>
     public float NearestFriendDist { get; private set; } = float.PositiveInfinity;
 
+    /// <summary>是否是领导者</summary>
+    public bool IsLeader { get; set; }
+
+    /// <summary>要跟随的领导者</summary>
+    public Boid? Leader { get; set; }
+
+    /// <summary>目标吸引点（null表示无目标）</summary>
+    public Vector3? TargetPosition { get; set; }
+
     // 两阶段更新：Flock 先用 ComputeForces 再统一 Integrate
     private Vector3 _acceleration;
+
+    // Wander 行为状态
+    private float _wanderAngle;
+    private static readonly Random _rand = new();
 
     public Boid(int id, Vector3 initialPosition, Vector3 initialVelocity)
     {
@@ -103,11 +138,36 @@ public class Boid
 
         _acceleration = Vector3.Zero;
 
+        // 三大基础规则
         if (VisibleFriends.Count > 0)
         {
             _acceleration += KeepDistance(settings) * settings.SeparationWeight;
             _acceleration += MatchHeading(settings) * settings.AlignmentWeight;
             _acceleration += SteerToCenter(settings) * settings.CohesionWeight;
+        }
+
+        // 扩展行为：躲避敌人
+        if (VisibleEnemies.Count > 0)
+        {
+            _acceleration += EvadeEnemies(settings) * settings.EvadeWeight;
+        }
+
+        // 扩展行为：目标吸引
+        if (TargetPosition.HasValue)
+        {
+            _acceleration += SeekTarget(settings) * settings.SeekTargetWeight;
+        }
+
+        // 扩展行为：跟随领导者
+        if (Leader != null && Leader != this)
+        {
+            _acceleration += FollowLeader(settings) * settings.FollowLeaderWeight;
+        }
+
+        // 扩展行为：无目标时随机漫游
+        if (!TargetPosition.HasValue && Leader == null)
+        {
+            _acceleration += Wander(settings) * settings.WanderWeight;
         }
 
         _acceleration += Cruise(settings);
@@ -244,13 +304,137 @@ public class Boid
         return Velocity.Normalize() * correction;
     }
 
-    /// <summary>感知：找出所有可见的同伴</summary>
+    #region 扩展行为
+
+    /// <summary>躲避：远离所有可见敌人</summary>
+    private Vector3 EvadeEnemies(BoidSettings settings)
+    {
+        Vector3 fleeSum = Vector3.Zero;
+        int count = 0;
+
+        foreach (var enemy in VisibleEnemies)
+        {
+            Vector3 away = Position - enemy.Position;
+            float distance = away.Length();
+
+            // 只在恐慌半径内躲避
+            if (distance > 0 && distance < settings.EvadePanicRadius)
+            {
+                // 距离越近，逃离越急
+                float urgency = 1f - (distance / settings.EvadePanicRadius);
+                away = away.Normalize() * urgency;
+                fleeSum += away;
+                count++;
+            }
+        }
+
+        if (count > 0)
+        {
+            fleeSum /= count;
+            return SteerTo(fleeSum * settings.DesiredSpeed * 2, settings);
+        }
+
+        return Vector3.Zero;
+    }
+
+    /// <summary>目标吸引：朝着目标点移动（带到达减速）</summary>
+    private Vector3 SeekTarget(BoidSettings settings)
+    {
+        if (!TargetPosition.HasValue) return Vector3.Zero;
+
+        Vector3 offset = TargetPosition.Value - Position;
+        float distance = offset.Length();
+
+        // 计算期望速度
+        float desiredSpeed = settings.DesiredSpeed;
+
+        // 在减速半径内，速度与距离成正比
+        if (distance < settings.ArriveSlowingRadius)
+        {
+            desiredSpeed = settings.DesiredSpeed * (distance / settings.ArriveSlowingRadius);
+        }
+
+        Vector3 desired = offset.SetMagnitude(desiredSpeed);
+        Vector3 steering = desired - Velocity;
+        return steering;
+    }
+
+    /// <summary>跟随领导者：保持在领导者后方</summary>
+    private Vector3 FollowLeader(BoidSettings settings)
+    {
+        if (Leader == null) return Vector3.Zero;
+
+        // 领导者后方的跟随点
+        float followDistance = 3f;
+        Vector3 leaderBack = -Leader.Velocity.Normalize() * followDistance;
+        Vector3 followTarget = Leader.Position + leaderBack;
+
+        // 对跟随点执行 Arrive 行为
+        Vector3 offset = followTarget - Position;
+        float distance = offset.Length();
+
+        float desiredSpeed = settings.DesiredSpeed;
+        if (distance < settings.ArriveSlowingRadius)
+        {
+            desiredSpeed = settings.DesiredSpeed * (distance / settings.ArriveSlowingRadius);
+        }
+
+        Vector3 desired = offset.SetMagnitude(desiredSpeed);
+        Vector3 steering = desired - Velocity;
+
+        // 额外：与领导者保持分离
+        float leaderDist = Vector3.Distance(Position, Leader.Position);
+        if (leaderDist < followDistance * 0.5f)
+        {
+            Vector3 away = Position - Leader.Position;
+            steering += away.Normalize() * settings.MaxAcceleration * 0.5f;
+        }
+
+        return steering;
+    }
+
+    /// <summary>漫游：自然的随机移动</summary>
+    private Vector3 Wander(BoidSettings settings)
+    {
+        // 随机偏移角度
+        _wanderAngle += (float)(_rand.NextDouble() * 2 - 1) * 0.3f;
+
+        // 漫游圆参数
+        float wanderRadius = 1.2f;
+        float wanderDistance = 2f;
+
+        // 计算漫游圆上的目标点
+        Vector3 circleTarget = new Vector3(
+            MathF.Cos(_wanderAngle) * wanderRadius,
+            0,
+            MathF.Sin(_wanderAngle) * wanderRadius
+        );
+
+        // 将圆移到智能体前方
+        Vector3 forward = Velocity.Length() > 0.01f
+            ? Velocity.Normalize()
+            : Vector3.UnitZ;
+
+        Vector3 wanderCenter = Position + forward * wanderDistance;
+        Vector3 target = wanderCenter + circleTarget;
+
+        // 转化为转向力
+        Vector3 desired = (target - Position).SetMagnitude(settings.DesiredSpeed);
+        Vector3 steering = desired - Velocity;
+        return steering;
+    }
+
+    #endregion
+
+    /// <summary>感知：找出所有可见的同伴和敌人</summary>
     private void SeeFriends(Flock flock, float perceptionRange, int maxVisible)
     {
         VisibleFriends.Clear();
+        VisibleEnemies.Clear();
         NearestFriend = null;
         NearestFriendDist = float.PositiveInfinity;
 
+        // 感知本群体的同伴
         foreach (var boid in flock.Boids)
         {
             if (boid == this) continue;
@@ -265,6 +449,22 @@ public class Boid
                 {
                     NearestFriendDist = dist;
                     NearestFriend = boid;
+                }
+            }
+        }
+
+        // 感知其他群体（敌人）
+        if (flock.EnemyFlocks != null)
+        {
+            foreach (var enemyFlock in flock.EnemyFlocks)
+            {
+                foreach (var enemy in enemyFlock.Boids)
+                {
+                    float dist = Vector3.Distance(Position, enemy.Position);
+                    if (dist < perceptionRange)
+                    {
+                        VisibleEnemies.Add(enemy);
+                    }
                 }
             }
         }
