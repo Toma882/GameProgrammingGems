@@ -1,0 +1,46 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+bin/
+obj/
+
+# Visual Studio
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.suo.cache
+.vsconfig
+
+# Rider / JetBrains
+.idea/
+*.sln.iml
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.log
+
+# Windows
+Thumbs.db
+Desktop.ini
+*.lnk
+
+# Claude IDE
+.claude/
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+
+# NuGet
+*.nupkg
+packages/
+
+# Publish output
+publish/
+AppPackages/
+BundleArtifacts/
