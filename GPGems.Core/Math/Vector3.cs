@@ -37,6 +37,8 @@ public readonly struct Vector2
         return len > 1e-6f ? new Vector2(X / len, Y / len) : Zero;
     }
 
+    public Vector2 Normalized() => Normalize();
+
     public static float Dot(Vector2 a, Vector2 b) => a.X * b.X + a.Y * b.Y;
     public static float Cross(Vector2 a, Vector2 b) => a.X * b.Y - a.Y * b.X;
     public static float Distance(Vector2 a, Vector2 b) => MathF.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));

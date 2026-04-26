@@ -146,8 +146,8 @@
                                 <DataTemplate>
                                     <StackPanel Orientation="Horizontal" Margin="0 2">
                                         <TextBlock Text="{Binding Label}" Width="30" Foreground="White" FontSize="10"/>
-                                        <ProgressBar Value="{Binding Percent}" Maximum="100" Height="12" Width="150"
-                                                     Background="#16213e" Foreground="{Binding Color}"/>
+                                        <ProgressBar Value="{Binding Percent, Mode=OneWay}" Maximum="100" Height="12" Width="150"
+                                                     Background="#16213e" Foreground="{Binding Color, Mode=OneWay}"/>
                                         <TextBlock Text="{Binding Count}" Width="40" Foreground="#a0a0a0" FontSize="10" Margin="5 0"/>
                                     </StackPanel>
                                 </DataTemplate>

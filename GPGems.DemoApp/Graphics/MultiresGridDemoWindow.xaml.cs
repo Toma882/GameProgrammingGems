@@ -128,8 +128,7 @@ public partial class MultiresGridDemoWindow : Window
         Log($"正在生成地形... 大小: {size}x{size}");
 
         // 使用中点位移算法生成地形
-        var midpoint = new MidpointDisplacement();
-        _heightfield = midpoint.Generate(size, 0.7f, 100);
+        _heightfield = MidpointDisplacement.Generate(size, 0.7f, 100);
 
         // 创建多分辨率栅格
         _multiresGrid = new MultiresGrid(_heightfield, chunkSize, 2.0f, maxLOD);

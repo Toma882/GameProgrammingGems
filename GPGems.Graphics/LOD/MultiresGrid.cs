@@ -118,6 +118,9 @@ public class MultiresGrid
     /// <summary>Y方向的总顶点数</summary>
     public int TotalHeight => _heightfield.GetLength(0);
 
+    /// <summary>地形宽度（兼容别名）</summary>
+    public int TerrainWidth => TotalWidth;
+
     /// <summary>块大小</summary>
     public int ChunkSize => _chunkSize;
 

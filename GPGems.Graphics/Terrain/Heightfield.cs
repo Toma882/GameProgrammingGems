@@ -165,4 +165,7 @@ public class Heightfield
 
     /// <summary>获取原始高度数组（用于可视化）</summary>
     public float[,] GetRawData() => _heights;
+
+    /// <summary>隐式转换为 float[,]</summary>
+    public static implicit operator float[,](Heightfield hf) => hf._heights;
 }
