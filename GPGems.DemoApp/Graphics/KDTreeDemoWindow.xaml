@@ -1,0 +1,196 @@
+<Window x:Class="GPGems.DemoApp.Graphics.KDTreeDemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="🌲 KD 树 k-近邻搜索 - Game Programming Gems"
+        Height="900" Width="1500"
+        WindowStartupLocation="CenterScreen"
+        Background="#0f0f23">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+
+        <!-- 📖 顶部：算法说明区 -->
+        <Border Grid.Row="0" Background="#1a1a2e" Padding="15">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <TextBlock Text="🌲 KD 树 k-近邻搜索" FontSize="18" Foreground="White" FontWeight="Bold"/>
+                    <TextBlock Text="轴交替二分 + 中位数分割 + 回溯剪枝" FontSize="12" Foreground="#a0a0a0" Margin="0 3"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="50 0 0 0" VerticalAlignment="Center">
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="NodeCountText" Text="节点数: 0" Foreground="#e67e22" FontSize="12"/>
+                    </Border>
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="PointCountText" Text="点数: 0" Foreground="#e67e22" FontSize="12"/>
+                    </Border>
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="DepthText" Text="最大深度: 0" Foreground="#e67e22" FontSize="12"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- 轴颜色图例 -->
+                <StackPanel Orientation="Horizontal" Margin="50 0 0 0" VerticalAlignment="Center">
+                    <Border Width="16" Height="16" Background="#e74c3c" CornerRadius="2" Margin="0 0 5 0"/>
+                    <TextBlock Text="X 轴分割" Foreground="#aaa" FontSize="11" Margin="0 0 15 0"/>
+
+                    <Border Width="16" Height="16" Background="#2ecc71" CornerRadius="2" Margin="0 0 5 0"/>
+                    <TextBlock Text="Y 轴分割" Foreground="#aaa" FontSize="11" Margin="0 0 15 0"/>
+
+                    <Border Width="16" Height="16" Background="#3498db" CornerRadius="2" Margin="0 0 5 0"/>
+                    <TextBlock Text="Z 轴分割" Foreground="#aaa" FontSize="11"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="240"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ⚙️ 左侧：参数调节区 -->
+            <Border Grid.Column="0" Background="#1a1a2e" Margin="5" Padding="12" CornerRadius="8">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="⚙️ 参数调节" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                        <!-- k 值（近邻数量） -->
+                        <TextBlock Text="k-近邻数量" Foreground="#a0a0a0" FontSize="11" Margin="0 8 0 2"/>
+                        <Slider x:Name="KValueSlider" Minimum="1" Maximum="20" Value="5"
+                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                Foreground="#e67e22"/>
+                        <TextBlock x:Name="KValueText" Text="5" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <!-- 点数量 -->
+                        <TextBlock Text="随机点数量" Foreground="#a0a0a0" FontSize="11" Margin="0 8 0 2"/>
+                        <Slider x:Name="PointCountSlider" Minimum="100" Maximum="2000" Value="500"
+                                TickFrequency="100" IsSnapToTickEnabled="True"
+                                Foreground="#e67e22"/>
+                        <TextBlock x:Name="PointCountValue" Text="500" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <Button x:Name="RegenerateButton" Content="🔄 重新生成 + 构建"
+                                Background="#e67e22" Foreground="White" FontWeight="Bold"
+                                Padding="8" Margin="0 15 0 3" Click="RegenerateButton_Click"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <!-- 显示选项 -->
+                        <TextBlock Text="👁 显示选项" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 0 0 8"/>
+
+                        <CheckBox x:Name="ShowSplitsCheck" Content="显示分割线"
+                                  IsChecked="True" Foreground="White" Margin="0 3" Click="Redraw"/>
+
+                        <CheckBox x:Name="ShowAxisColorsCheck" Content="按轴着色"
+                                  IsChecked="True" Foreground="White" Margin="0 3" Click="Redraw"/>
+
+                        <CheckBox x:Name="ShowSearchPathCheck" Content="高亮搜索路径"
+                                  IsChecked="True" Foreground="White" Margin="0 3" Click="Redraw"/>
+
+                        <CheckBox x:Name="ShowPointsCheck" Content="显示点云"
+                                  IsChecked="True" Foreground="White" Margin="0 3" Click="Redraw"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <!-- 搜索结果列表 -->
+                        <TextBlock Text="🎯 k-近邻结果" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 0 0 8"/>
+                        <ListBox x:Name="ResultsListBox" Background="#0a0a1a" Foreground="White"
+                                 FontSize="10" Height="120" BorderThickness="0"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- 🖼️ 中央：四视图 3D 可视化区 -->
+            <Border Grid.Column="1" Background="#0a0a1a" Margin="5 5 5 0" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- 左上：XY 平面俯视图 -->
+                    <Border Grid.Row="0" Grid.Column="0" Background="#0d0d20" Margin="3" BorderBrush="#333" BorderThickness="1">
+                        <Grid>
+                            <TextBlock Text="XY 俯视图" Foreground="#888" FontSize="10" Margin="5" HorizontalAlignment="Left"/>
+                            <Canvas x:Name="ViewXY" Background="Transparent" ClipToBounds="True"
+                                    MouseMove="ViewXY_MouseMove" Tag="XY"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 右上：XZ 平面前视图 -->
+                    <Border Grid.Row="0" Grid.Column="1" Background="#0d0d20" Margin="3" BorderBrush="#333" BorderThickness="1">
+                        <Grid>
+                            <TextBlock Text="XZ 前视图" Foreground="#888" FontSize="10" Margin="5" HorizontalAlignment="Left"/>
+                            <Canvas x:Name="ViewXZ" Background="Transparent"
+                                    MouseMove="ViewXZ_MouseMove" Tag="XZ" ClipToBounds="True"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 左下：YZ 平面侧视图 -->
+                    <Border Grid.Row="1" Grid.Column="0" Background="#0d0d20" Margin="3" BorderBrush="#333" BorderThickness="1">
+                        <Grid>
+                            <TextBlock Text="YZ 侧视图" Foreground="#888" FontSize="10" Margin="5" HorizontalAlignment="Left"/>
+                            <Canvas x:Name="ViewYZ" Background="Transparent"
+                                    MouseMove="ViewYZ_MouseMove" Tag="YZ" ClipToBounds="True"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- 右下：3D 斜投影视图 -->
+                    <Border Grid.Row="1" Grid.Column="1" Background="#0d0d20" Margin="3" BorderBrush="#333" BorderThickness="1">
+                        <Grid>
+                            <TextBlock Text="3D 斜投影" Foreground="#888" FontSize="10" Margin="5" HorizontalAlignment="Left"/>
+                            <Canvas x:Name="View3D" Background="Transparent"
+                                    MouseMove="View3D_MouseMove" Tag="3D" ClipToBounds="True"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- 📊 右侧：性能监控 -->
+            <Border Grid.Column="2" Background="#1a1a2e" Margin="5" Padding="12" CornerRadius="8">
+                <StackPanel>
+                    <TextBlock Text="📊 性能监控" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 12"/>
+
+                    <TextBlock Text="构建耗时" Foreground="#a0a0a0" FontSize="11" Margin="0 8 0 2"/>
+                    <TextBlock x:Name="BuildTimeText" Text="0 ms" Foreground="#e67e22" FontSize="18" FontWeight="Bold"/>
+
+                    <TextBlock Text="k-近邻搜索耗时" Foreground="#a0a0a0" FontSize="11" Margin="0 12 0 2"/>
+                    <TextBlock x:Name="SearchTimeText" Text="0 μs" Foreground="#4ecca3" FontSize="18" FontWeight="Bold"/>
+
+                    <TextBlock Text="暴力搜索耗时" Foreground="#a0a0a0" FontSize="11" Margin="0 12 0 2"/>
+                    <TextBlock x:Name="BruteForceTimeText" Text="0 μs" Foreground="#e74c3c" FontSize="18" FontWeight="Bold"/>
+
+                    <TextBlock Text="加速比" Foreground="#a0a0a0" FontSize="11" Margin="0 12 0 2"/>
+                    <TextBlock x:Name="SpeedupText" Text="0x" Foreground="#3498db" FontSize="20" FontWeight="Bold"/>
+
+                    <Separator Background="#333" Margin="0 15"/>
+
+                    <TextBlock Text="💡 操作提示" FontSize="11" Foreground="#a0a0a0" Margin="0 0 0 8"/>
+                    <TextBlock Text="各视图移动鼠标更新查询点" Foreground="#666" FontSize="10" Margin="0 2"/>
+                    <TextBlock Text="红色 = X轴分割线" Foreground="#e74c3c" FontSize="10" Margin="0 2"/>
+                    <TextBlock Text="绿色 = Y轴分割线" Foreground="#2ecc71" FontSize="10" Margin="0 2"/>
+                    <TextBlock Text="蓝色 = Z轴分割线" Foreground="#3498db" FontSize="10" Margin="0 2"/>
+                    <TextBlock Text="黄色 = 搜索命中的路径" Foreground="#f1c40f" FontSize="10" Margin="0 2"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- 📝 底部：日志输出区 -->
+        <Border Grid.Row="2" Background="#0a0a1a" Margin="5 0 5 5" Padding="8" CornerRadius="8">
+            <ScrollViewer>
+                <TextBlock x:Name="LogText" Foreground="#e67e22" FontFamily="Consolas" FontSize="10"/>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>

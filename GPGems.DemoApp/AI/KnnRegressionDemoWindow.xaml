@@ -1,0 +1,128 @@
+<Window x:Class="GPGems.DemoApp.AI.KnnRegressionDemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="k-NN 回归模型可视化 - Game Programming Gems"
+        Height="800" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#0f0f23">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="280"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 左侧：参数控制面板 -->
+        <Border Grid.Column="0" Background="#1a1a2e" Margin="5" Padding="12" CornerRadius="8">
+            <ScrollViewer>
+                <StackPanel>
+                    <TextBlock Text="⚙️ 模型参数" FontSize="16" Foreground="White" FontWeight="Bold" Margin="0 0 0 15"/>
+
+                    <!-- k 值选择 -->
+                    <TextBlock Text="k 值（邻居数量）" Foreground="#a0a0a0" FontSize="11" Margin="0 8 0 2"/>
+                    <Slider x:Name="KValueSlider" Minimum="1" Maximum="20" Value="5" TickFrequency="1" IsSnapToTickEnabled="True" Foreground="#e67e22"/>
+                    <TextBlock x:Name="KValueText" Text="5" Foreground="#e67e22" FontSize="14" FontWeight="Bold" HorizontalAlignment="Right"/>
+
+                    <!-- 距离度量 -->
+                    <TextBlock Text="距离度量方式" Foreground="#a0a0a0" FontSize="11" Margin="0 15 0 5"/>
+                    <ComboBox x:Name="DistanceMetricCombo" Foreground="White" Background="#16213e" BorderThickness="0">
+                        <ComboBoxItem Content="欧氏距离 (L2)" IsSelected="True"/>
+                        <ComboBoxItem Content="曼哈顿距离 (L1)"/>
+                    </ComboBox>
+
+                    <!-- 权重模式 -->
+                    <TextBlock Text="加权模式" Foreground="#a0a0a0" FontSize="11" Margin="0 15 0 5"/>
+                    <RadioButton x:Name="UniformWeight" Content="平均（等权重）" Foreground="White" Margin="0 3"/>
+                    <RadioButton x:Name="DistanceWeight" Content="距离加权（近的权重高）" Foreground="White" IsChecked="True" Margin="0 3"/>
+
+                    <Separator Background="#333" Margin="0 15"/>
+
+                    <!-- 数据集选择 -->
+                    <TextBlock Text="📊 测试数据集" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 8"/>
+                    <Button x:Name="LoadLinearBtn" Content="线性函数 y = 2x + 噪声" Background="#16213e" Foreground="#3498db" Padding="8" Margin="0 3" Click="LoadLinear_Click"/>
+                    <Button x:Name="LoadSinBtn" Content="正弦函数 y = sin(x)" Background="#16213e" Foreground="#9b59b6" Padding="8" Margin="0 3" Click="LoadSin_Click"/>
+                    <Button x:Name="LoadQuadraticBtn" Content="二次函数 y = x²" Background="#16213e" Foreground="#2ecc71" Padding="8" Margin="0 3" Click="LoadQuadratic_Click"/>
+                    <Button x:Name="LoadGameDamageBtn" Content="游戏伤害预测数据" Background="#16213e" Foreground="#e74c3c" Padding="8" Margin="0 3" Click="LoadGameDamage_Click"/>
+
+                    <Separator Background="#333" Margin="0 15"/>
+
+                    <!-- 操作按钮 -->
+                    <Button x:Name="AddRandomBtn" Content="🎲 添加随机点" Background="#e67e22" Foreground="White" Padding="8" Margin="0 3" Click="AddRandom_Click"/>
+                    <Button x:Name="ClearBtn" Content="🗑️ 清空数据" Background="#c0392b" Foreground="White" Padding="8" Margin="0 3" Click="Clear_Click"/>
+
+                    <Separator Background="#333" Margin="0 15"/>
+
+                    <!-- 显示选项 -->
+                    <TextBlock Text="👁 显示选项" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 0 0 8"/>
+                    <CheckBox x:Name="ShowNeighborsCheck" Content="高亮最近k个邻居" IsChecked="True" Foreground="White" Margin="0 3"/>
+                    <CheckBox x:Name="ShowDistanceLinesCheck" Content="显示距离连线" IsChecked="False" Foreground="White" Margin="0 3"/>
+                    <CheckBox x:Name="ShowRegressionLineCheck" Content="显示完整回归曲线" IsChecked="True" Foreground="White" Margin="0 3"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- 中间：可视化区域 -->
+        <Border Grid.Column="1" Background="#0a0a1a" Margin="5 5 5 0" CornerRadius="8">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- 标题 -->
+                <Border Grid.Row="0" Background="#16213e" Padding="12" CornerRadius="8 8 0 0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📈 k-NN 回归曲线拟合" FontSize="16" Foreground="White" FontWeight="Bold"/>
+                        <TextBlock x:Name="SampleCountText" Text="样本数: 0" Foreground="#a0a0a0" Margin="20 0 0 0" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 图表区域 -->
+                <Canvas x:Name="ChartCanvas" Grid.Row="1" Background="#0d0d20"
+                        MouseMove="ChartCanvas_MouseMove" MouseLeave="ChartCanvas_MouseLeave"/>
+            </Grid>
+        </Border>
+
+        <!-- 右侧：预测结果与解释 -->
+        <Border Grid.Column="2" Background="#1a1a2e" Margin="5" Padding="12" CornerRadius="8">
+            <StackPanel>
+                <TextBlock Text="🎯 实时预测" FontSize="16" Foreground="White" FontWeight="Bold" Margin="0 0 0 12"/>
+
+                <!-- 当前鼠标位置 -->
+                <Border Background="#16213e" Padding="10" CornerRadius="6">
+                    <StackPanel>
+                        <TextBlock Text="查询点 X" Foreground="#a0a0a0" FontSize="10"/>
+                        <TextBlock x:Name="QueryXText" Text="--" Foreground="#3498db" FontSize="20" FontWeight="Bold"/>
+                        <TextBlock Text="预测值 Y" Foreground="#a0a0a0" FontSize="10" Margin="0 8 0 0"/>
+                        <TextBlock x:Name="PredictionYText" Text="--" Foreground="#2ecc71" FontSize="24" FontWeight="Bold"/>
+                    </StackPanel>
+                </Border>
+
+                <Separator Background="#333" Margin="0 15"/>
+
+                <!-- k个最近邻居详情 -->
+                <TextBlock Text="📍 k 个最近邻居" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 0 0 8"/>
+                <ListBox x:Name="NeighborsListBox" Background="#0a0a1a" Foreground="White" FontSize="10" Height="200" BorderThickness="0"/>
+
+                <Separator Background="#333" Margin="0 15"/>
+
+                <!-- 算法说明 -->
+                <TextBlock Text="💡 算法原理" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 0 0 8"/>
+                <TextBlock TextWrapping="Wrap" Foreground="#888" FontSize="10" LineHeight="18">
+                    <Run>1. 找到离查询点最近的 k 个样本点</Run><LineBreak/>
+                    <Run>2. 计算每个邻居的权重 = 1/距离²</Run><LineBreak/>
+                    <Run>3. 加权平均输出预测值</Run><LineBreak/>
+                    <Run>4. 距离越近，对结果影响越大</Run>
+                </TextBlock>
+
+                <Separator Background="#333" Margin="0 15"/>
+
+                <!-- 性能指标 -->
+                <TextBlock Text="⚡ 性能" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 0 0 8"/>
+                <TextBlock x:Name="PredictionTimeText" Text="预测耗时: -- μs" Foreground="#f39c12" FontSize="11"/>
+                <TextBlock x:Name="MseText" Text="均方误差: --" Foreground="#e74c3c" FontSize="11" Margin="0 5 0 0"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

@@ -118,6 +118,81 @@
                     </Grid>
                 </Border>
 
+                <!-- 四叉树空间分割 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#4ecdc4" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenQuadtreeDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="🟦" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="四叉树空间分割" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="2D 网格 + 高度场 LOD" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="范围/最近邻查询" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 八叉树 3D 空间分割 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#9b59b6" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenOctreeDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="📦" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="八叉树 3D 空间分割" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="四视图 3D 投影" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="范围/射线查询" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- KD 树 k-近邻搜索 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#f1c40f" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenKDTreeDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="🌲" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="KD 树 k-近邻搜索" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="中位数分割 + 回溯剪枝" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="按轴着色 + 搜索路径可视化" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- k-NN 回归模型可视化 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#2ecc71" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenKnnRegressionDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="📈" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="k-NN 回归模型" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="加权平均 + 曲线拟合" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="可调k值 + 距离度量 + MSE" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 最近邻算法性能对比 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#9b59b6" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenNearestNeighborBenchmark"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="⚡" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="最近邻算法基准测试" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="暴力 vs KD树 vs Ball树 vs LSH" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="维度/规模扫描动画" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
             </WrapPanel>
         </ScrollViewer>
     </Grid>
