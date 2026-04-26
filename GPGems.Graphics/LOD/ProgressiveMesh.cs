@@ -479,8 +479,9 @@ public class ProgressiveMesh
         // 标记 u 为非激活
         u.IsActive = false;
 
-        // 更新 v 的邻居
-        foreach (int nvi in u.NeighborIndices)
+        // 更新 v 的邻居（先复制列表避免遍历修改问题）
+        var neighbors = u.NeighborIndices.ToList();
+        foreach (int nvi in neighbors)
         {
             if (nvi != vIndex && !v.NeighborIndices.Contains(nvi))
             {
@@ -701,6 +702,14 @@ public class ProgressiveMesh
         foreach (var face in _faces)
         {
             if (!face.IsActive) continue;
+
+            // 跳过包含非活动顶点的面（防止字典查找失败）
+            if (!indexMap.ContainsKey(face.Indices[0]) ||
+                !indexMap.ContainsKey(face.Indices[1]) ||
+                !indexMap.ContainsKey(face.Indices[2]))
+            {
+                continue;
+            }
 
             indices.Add(indexMap[face.Indices[0]]);
             indices.Add(indexMap[face.Indices[1]]);

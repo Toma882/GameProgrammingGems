@@ -201,7 +201,7 @@ public class CLODTerrain
         {
             Orientation = 1,
             BaseX = 0,
-            BaseY = power,
+            BaseY = 0,
             Size = power,
             Level = 0
         };
@@ -222,21 +222,21 @@ public class CLODTerrain
     /// <summary>获取顶点（带缓存）</summary>
     private Vector3 GetVertex(int x, int y)
     {
-        if (_vertexCache[y, x].HasValue)
-        {
-            return _vertexCache[y, x].Value;
-        }
-
         // 边界外的点取最近的边界点
         int clampedX = Math.Clamp(x, 0, _heightfield.Width - 1);
         int clampedY = Math.Clamp(y, 0, _heightfield.Height - 1);
 
-        float worldX = x * _vertexSpacing;
-        float worldZ = y * _vertexSpacing;
+        if (_vertexCache[clampedY, clampedX].HasValue)
+        {
+            return _vertexCache[clampedY, clampedX].Value;
+        }
+
+        float worldX = clampedX * _vertexSpacing;
+        float worldZ = clampedY * _vertexSpacing;
         float worldY = _heightfield[clampedX, clampedY];
 
         var result = new Vector3(worldX, worldY, worldZ);
-        _vertexCache[y, x] = result;
+        _vertexCache[clampedY, clampedX] = result;
 
         return result;
     }
@@ -246,17 +246,19 @@ public class CLODTerrain
     {
         if (node.Orientation == 0)
         {
-            // Orientation 0: 左下 (base) -> 右下 -> 右上
+            // Orientation 0: 对角线 左下→右上
+            // 顶点：左下 -> 右下 -> 右上
             node.Vertices[0] = GetVertex(node.BaseX, node.BaseY);
             node.Vertices[1] = GetVertex(node.BaseX + node.Size, node.BaseY);
             node.Vertices[2] = GetVertex(node.BaseX + node.Size, node.BaseY + node.Size);
         }
         else
         {
-            // Orientation 1: 左上 (base) -> 右上 -> 右下
+            // Orientation 1: 对角线 右上→左下
+            // 顶点：左上 -> 右上 -> 左下
             node.Vertices[0] = GetVertex(node.BaseX, node.BaseY);
             node.Vertices[1] = GetVertex(node.BaseX + node.Size, node.BaseY);
-            node.Vertices[2] = GetVertex(node.BaseX, node.BaseY - node.Size);
+            node.Vertices[2] = GetVertex(node.BaseX, node.BaseY + node.Size);
         }
     }
 
@@ -267,9 +269,14 @@ public class CLODTerrain
     /// <summary>计算点的几何误差</summary>
     private float ComputePointError(int x, int y, int size)
     {
-        if (_errorCache[y, x].HasValue)
+        // 边界检查，防止数组越界
+        int maxIndex = _errorCache.GetLength(0) - 1;
+        int clampedX = Math.Clamp(x, 0, maxIndex);
+        int clampedY = Math.Clamp(y, 0, maxIndex);
+
+        if (_errorCache[clampedY, clampedX].HasValue)
         {
-            return _errorCache[y, x].Value;
+            return _errorCache[clampedY, clampedX].Value;
         }
 
         if (size <= 1)
@@ -294,7 +301,7 @@ public class CLODTerrain
             error += ComputePointError(x + halfSize / 2, y, halfSize) * 0.5f;
         }
 
-        _errorCache[y, x] = error;
+        _errorCache[clampedY, clampedX] = error;
         return error;
     }
 
@@ -333,18 +340,11 @@ public class CLODTerrain
         int halfSize = node.Size / 2;
         var splitPoint = node.GetSplitPoint();
 
-        // 确保邻居有相同或更高的细节级别（防止裂缝）
-        // 检查左侧邻居
-        if (node.LeftNeighbor != null && node.LeftNeighbor.Size > node.Size)
-        {
-            Split(node.LeftNeighbor);
-        }
-
-        // 检查右侧邻居
-        if (node.RightNeighbor != null && node.RightNeighbor.Size > node.Size)
-        {
-            Split(node.RightNeighbor);
-        }
+        // 确保所有邻居的细节级别不低于当前节点（防止裂缝）
+        // ROAM规则：相邻三角形大小差别不能超过2倍
+        ForceNeighborSplit(node.LeftNeighbor, node.Size);
+        ForceNeighborSplit(node.RightNeighbor, node.Size);
+        ForceNeighborSplit(node.BaseNeighbor, node.Size);
 
         // 创建子节点
         if (node.Orientation == 0)
@@ -380,7 +380,7 @@ public class CLODTerrain
             {
                 Orientation = 0,
                 BaseX = node.BaseX,
-                BaseY = node.BaseY - halfSize,
+                BaseY = node.BaseY,
                 Size = halfSize,
                 Level = node.Level + 1,
                 Parent = node
@@ -391,7 +391,7 @@ public class CLODTerrain
             {
                 Orientation = 1,
                 BaseX = node.BaseX + halfSize,
-                BaseY = node.BaseY,
+                BaseY = node.BaseY + halfSize,
                 Size = halfSize,
                 Level = node.Level + 1,
                 Parent = node
@@ -424,6 +424,18 @@ public class CLODTerrain
         node.RightChild = null;
     }
 
+    /// <summary>强制邻居剖分（如果需要）</summary>
+    private void ForceNeighborSplit(TriNode? neighbor, int currentSize)
+    {
+        if (neighbor == null) return;
+
+        // 如果邻居比当前节点大超过2倍，必须先剖分邻居防止裂缝
+        while (neighbor.Size > currentSize)
+        {
+            if (!Split(neighbor)) break;
+        }
+    }
+
     /// <summary>建立子节点邻居关系</summary>
     private void SetupChildNeighbors(TriNode node)
     {
@@ -435,41 +447,69 @@ public class CLODTerrain
         right.LeftNeighbor = left;
 
         // 继承父节点的邻居关系
-        if (node.BaseNeighbor != null && node.BaseNeighbor.IsLeaf)
+        if (node.BaseNeighbor != null)
         {
-            if (node.Orientation == 0)
+            if (node.BaseNeighbor.IsLeaf)
             {
-                left.BaseNeighbor = node.BaseNeighbor.RightChild;
-                right.BaseNeighbor = node.BaseNeighbor.LeftChild;
+                // 邻居是叶子（未剖分），子节点直接指向邻居本身
+                left.BaseNeighbor = node.BaseNeighbor;
+                right.BaseNeighbor = node.BaseNeighbor;
             }
             else
             {
-                left.BaseNeighbor = node.BaseNeighbor.LeftChild;
-                right.BaseNeighbor = node.BaseNeighbor.RightChild;
+                // 邻居已剖分，指向邻居的对应子节点
+                if (node.Orientation == 0)
+                {
+                    left.BaseNeighbor = node.BaseNeighbor.RightChild;
+                    right.BaseNeighbor = node.BaseNeighbor.LeftChild;
+                }
+                else
+                {
+                    left.BaseNeighbor = node.BaseNeighbor.LeftChild;
+                    right.BaseNeighbor = node.BaseNeighbor.RightChild;
+                }
             }
         }
 
-        if (node.LeftNeighbor != null && node.LeftNeighbor.IsLeaf)
+        if (node.LeftNeighbor != null)
         {
-            if (node.LeftNeighbor.Orientation == node.Orientation)
+            if (node.LeftNeighbor.IsLeaf)
             {
-                left.LeftNeighbor = node.LeftNeighbor.RightChild;
+                // 邻居是叶子，左子节点直接指向邻居本身
+                left.LeftNeighbor = node.LeftNeighbor;
             }
             else
             {
-                left.LeftNeighbor = node.LeftNeighbor.LeftChild;
+                // 邻居已剖分，指向邻居的对应子节点
+                if (node.LeftNeighbor.Orientation == node.Orientation)
+                {
+                    left.LeftNeighbor = node.LeftNeighbor.RightChild;
+                }
+                else
+                {
+                    left.LeftNeighbor = node.LeftNeighbor.LeftChild;
+                }
             }
         }
 
-        if (node.RightNeighbor != null && node.RightNeighbor.IsLeaf)
+        if (node.RightNeighbor != null)
         {
-            if (node.RightNeighbor.Orientation == node.Orientation)
+            if (node.RightNeighbor.IsLeaf)
             {
-                right.RightNeighbor = node.RightNeighbor.LeftChild;
+                // 邻居是叶子，右子节点直接指向邻居本身
+                right.RightNeighbor = node.RightNeighbor;
             }
             else
             {
-                right.RightNeighbor = node.RightNeighbor.RightChild;
+                // 邻居已剖分，指向邻居的对应子节点
+                if (node.RightNeighbor.Orientation == node.Orientation)
+                {
+                    right.RightNeighbor = node.RightNeighbor.LeftChild;
+                }
+                else
+                {
+                    right.RightNeighbor = node.RightNeighbor.RightChild;
+                }
             }
         }
     }
