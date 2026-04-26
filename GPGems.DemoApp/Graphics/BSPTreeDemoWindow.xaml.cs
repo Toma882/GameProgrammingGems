@@ -7,6 +7,8 @@ using System.Windows.Shapes;
 using GPGems.Core.Graphics;
 using GPGems.Core.Math;
 using GPGems.Graphics.SpatialPartitioning;
+using Polygon = GPGems.Core.Geometry.Polygon;
+using Vertex = GPGems.Core.Geometry.Vertex;
 
 namespace GPGems.DemoApp.Graphics;
 
@@ -138,7 +140,7 @@ public partial class BSPTreeDemoWindow : Window
         float cy = 50 + (float)(_random.NextDouble() * (SpaceSize - 100));
         float width = 20 + (float)(_random.NextDouble() * 40);
         float height = 20 + (float)(_random.NextDouble() * 40);
-        float rotation = (float)(_random.NextDouble() * System.System.Math.PI * 0.5);
+        float rotation = (float)(_random.NextDouble() * System.Math.PI * 0.5);
 
         var vertices = new List<Vertex>();
         for (int i = 0; i < 4; i++)
@@ -276,7 +278,7 @@ public partial class BSPTreeDemoWindow : Window
 
     private void DrawTopDownView()
     {
-        double scale = System.System.Math.Min(ViewTopDown.ActualWidth, ViewTopDown.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(ViewTopDown.ActualWidth, ViewTopDown.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 1;
 
         // 绘制多边形
@@ -307,7 +309,7 @@ public partial class BSPTreeDemoWindow : Window
         // 简化：在 2D 视图中绘制分割线
         // 平面法向量的 x,y 分量决定了线的方向
         Color color = ShowDepthColorsCheck.IsChecked == true
-            ? DepthColors[System.System.Math.Min(depth, DepthColors.Length - 1)]
+            ? DepthColors[System.Math.Min(depth, DepthColors.Length - 1)]
             : Color.FromRgb(255, 100, 100);
 
         var brush = new SolidColorBrush(color) { Opacity = 0.8 };
@@ -325,7 +327,7 @@ public partial class BSPTreeDemoWindow : Window
 
         // 简化显示：用不同的斜线表示不同的分割
         double center = SpaceSize / 2 * scale;
-        if (System.System.Math.Abs(plane.Normal.X) > System.System.Math.Abs(plane.Normal.Y))
+        if (System.Math.Abs(plane.Normal.X) > System.Math.Abs(plane.Normal.Y))
         {
             // 近似垂直分割
             line.X1 = center + plane.Normal.X * 100 * scale;
@@ -351,7 +353,7 @@ public partial class BSPTreeDemoWindow : Window
 
     private void DrawPainterView()
     {
-        double scale = System.System.Math.Min(ViewPainter.ActualWidth, ViewPainter.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(ViewPainter.ActualWidth, ViewPainter.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 1;
 
         var viewpoint = new Vector3(_mousePos.X, _mousePos.Y, 200);
@@ -365,7 +367,7 @@ public partial class BSPTreeDemoWindow : Window
         {
             var center = ComputePolygonCenter(poly);
             float dist = (center - viewpoint).Length();
-            maxDist = System.System.Math.Max(maxDist, dist);
+            maxDist = System.Math.Max(maxDist, dist);
         }
 
         for (int i = 0; i < sorted.Count; i++)

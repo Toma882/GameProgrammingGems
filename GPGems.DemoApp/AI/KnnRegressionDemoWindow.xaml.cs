@@ -298,7 +298,7 @@ public partial class KnnRegressionDemoWindow : Window
         float queryX = ToDataX(pos.X);
 
         // 限制在数据范围内
-        queryX = Math.Clamp(queryX, _dataMinX, _dataMaxX);
+        queryX = System.Math.Clamp(queryX, _dataMinX, _dataMaxX);
         float prediction = Predict(queryX);
 
         QueryXText.Text = $"{queryX:F2}";

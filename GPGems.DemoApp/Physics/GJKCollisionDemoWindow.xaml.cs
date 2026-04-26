@@ -331,7 +331,7 @@ public partial class GJKCollisionDemoWindow : Window
             C = B;
             B = A;
             A = point;
-            Count = Math.Min(Count + 1, 3);
+            Count = System.Math.Min(Count + 1, 3);
         }
     }
 
