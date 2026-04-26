@@ -1,0 +1,182 @@
+<Window x:Class="GPGems.DemoApp.Graphics.ProgressiveMeshDemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="⚡ 渐进网格 Progressive Mesh - Game Programming Gems"
+        Height="850" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#0f0f23">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+
+        <!-- 📖 顶部：算法说明区 -->
+        <Border Grid.Row="0" Background="#1a1a2e" Padding="15">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <TextBlock Text="⚡ 渐进网格 Progressive Mesh" FontSize="18" Foreground="White" FontWeight="Bold"/>
+                    <TextBlock Text="GPG 1 - Polygonal Chapter | 边折叠/边分裂实现网格连续LOD" FontSize="12" Foreground="#a0a0a0" Margin="0 3"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="50 0 0 0" VerticalAlignment="Center">
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="VertexCountText" Text="顶点: 0 / 0" Foreground="#4ecca3" FontSize="12"/>
+                    </Border>
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="FaceCountText" Text="三角面: 0 / 0" Foreground="#4ecca3" FontSize="12"/>
+                    </Border>
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="CurrentLODText" Text="LOD层级: 0 / 0" Foreground="#e94560" FontSize="12"/>
+                    </Border>
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4">
+                        <TextBlock x:Name="ErrorText" Text="累计误差: 0" Foreground="#f39c12" FontSize="12"/>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ⚙️ 左侧：参数调节区 -->
+            <Border Grid.Column="0" Background="#1a1a2e" Margin="5" Padding="15" CornerRadius="8">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="⚙️ 参数调节" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 15"/>
+
+                        <!-- 目标模型选择 -->
+                        <TextBlock Text="目标模型" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <ComboBox x:Name="ModelComboBox" SelectedIndex="0" Background="#16213e" Foreground="White">
+                            <ComboBoxItem>🔺 不规则网格</ComboBoxItem>
+                            <ComboBoxItem>⭕ 圆形网格</ComboBoxItem>
+                            <ComboBoxItem>🏔️ 高度场网格</ComboBoxItem>
+                            <ComboBoxItem>✦ 星形网格</ComboBoxItem>
+                        </ComboBox>
+
+                        <!-- 网格分辨率 -->
+                        <TextBlock Text="网格分辨率" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="ResolutionSlider" Minimum="10" Maximum="80" Value="40"
+                                TickFrequency="10" IsSnapToTickEnabled="True"
+                                Foreground="#4ecca3"/>
+                        <TextBlock x:Name="ResolutionValue" Text="40" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <!-- LOD层级滑块 -->
+                        <TextBlock Text="当前LOD层级" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="LODSlider" Minimum="0" Maximum="100" Value="0"
+                                IsSnapToTickEnabled="True"
+                                Foreground="#4ecca3"/>
+                        <TextBlock x:Name="LODSliderValue" Text="0%" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <!-- 目标顶点数 -->
+                        <TextBlock Text="目标顶点数" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="TargetVertexSlider" Minimum="4" Maximum="2000" Value="2000"
+                                TickFrequency="50" IsSnapToTickEnabled="True"
+                                Foreground="#4ecca3"/>
+                        <TextBlock x:Name="TargetVertexValue" Text="2000" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <Button x:Name="GenerateButton" Content="🔄 生成网格并简化"
+                                Background="#4ecca3" Foreground="White" FontWeight="Bold"
+                                Padding="10" Margin="0 20 0 5" Click="GenerateButton_Click"/>
+
+                        <Button x:Name="AnimateLODButton" Content="▶ 自动播放LOD动画"
+                                Background="#e94560" Foreground="White" FontWeight="Bold"
+                                Padding="10" Margin="0 5" Click="AnimateLODButton_Click"/>
+
+                        <CheckBox x:Name="ShowOriginalEdgesCheck" Content="显示原始边"
+                                  IsChecked="False" Foreground="White" Margin="0 15 0 5"/>
+
+                        <CheckBox x:Name="ShowFoldedCheck" Content="高亮折叠区域"
+                                  IsChecked="True" Foreground="White" Margin="0 5"/>
+
+                        <CheckBox x:Name="ShowNormalsCheck" Content="显示法向量"
+                                  IsChecked="False" Foreground="White" Margin="0 5"/>
+
+                        <!-- 预设方案 -->
+                        <TextBlock Text="📋 预设方案" Foreground="#a0a0a0" FontSize="11" Margin="0 20 0 10"/>
+
+                        <Button Content="🎯 最大细节" Background="#16213e" Foreground="White"
+                                Padding="8" Margin="0 2" Click="PresetMaxDetail_Click"/>
+
+                        <Button Content="⚖️ 平衡简化" Background="#16213e" Foreground="White"
+                                Padding="8" Margin="0 2" Click="PresetBalanced_Click"/>
+
+                        <Button Content="🏃 最大简化" Background="#16213e" Foreground="White"
+                                Padding="8" Margin="0 2" Click="PresetMaxSimplify_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- 🖼️ 中央：主可视化区 -->
+            <Border Grid.Column="1" Background="#0a0a1a" Margin="5 5 5 0" CornerRadius="8">
+                <Grid>
+                    <Canvas x:Name="DrawCanvas" Background="Transparent"
+                            MouseMove="DrawCanvas_MouseMove"
+                            MouseWheel="DrawCanvas_MouseWheel"/>
+
+                    <!-- 信息叠加层 -->
+                    <Border Background="#16213eCC" Padding="8" CornerRadius="4"
+                            HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="10">
+                        <StackPanel>
+                            <TextBlock Text="💡 滚轮 = 缩放 | 拖动 = 旋转" Foreground="#a0a0a0" FontSize="10"/>
+                            <TextBlock Text="滑动LOD滑块观察简化效果" Foreground="#a0a0a0" FontSize="10" Margin="0 3 0 0"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!-- 📊 右侧：性能监控区 -->
+            <Border Grid.Column="2" Background="#1a1a2e" Margin="5" Padding="15" CornerRadius="8">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="📊 性能监控" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 15"/>
+
+                        <TextBlock Text="预处理时间" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <TextBlock x:Name="PreprocessTimeText" Text="0 ms" Foreground="#e94560" FontSize="20" FontWeight="Bold"/>
+
+                        <TextBlock Text="LOD切换时间" Foreground="#a0a0a0" FontSize="11" Margin="0 15 0 3"/>
+                        <TextBlock x:Name="LODSwitchTimeText" Text="0 μs" Foreground="#4ecca3" FontSize="20" FontWeight="Bold"/>
+
+                        <TextBlock Text="顶点缩减率" Foreground="#a0a0a0" FontSize="11" Margin="0 15 0 3"/>
+                        <TextBlock x:Name="VertexReductionText" Text="0%" Foreground="#f39c12" FontSize="20" FontWeight="Bold"/>
+
+                        <Separator Background="#333" Margin="0 20"/>
+
+                        <!-- 误差曲线图 -->
+                        <TextBlock Text="📈 误差曲线" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+                        <Canvas x:Name="ErrorGraphCanvas" Height="100" Background="#16213e"/>
+
+                        <Separator Background="#333" Margin="0 20"/>
+
+                        <TextBlock Text="💡 算法说明" FontSize="12" Foreground="#a0a0a0" Margin="0 0 0 10"/>
+                        <TextBlock Text="边折叠算法" Foreground="#4ecca3" FontSize="10" FontWeight="Bold" Margin="0 2"/>
+                        <TextBlock Text="每次折叠代价最低的边" Foreground="#666" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="误差 = 边长 × (1 + 曲率)" Foreground="#666" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="边界边惩罚因子=2" Foreground="#666" FontSize="10" Margin="0 2"/>
+
+                        <Separator Background="#333" Margin="0 20"/>
+
+                        <TextBlock Text="🔬 简化质量" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+                        <ProgressBar x:Name="QualityBar" Value="100" Maximum="100" Height="15" Foreground="#4ecca3"/>
+                        <TextBlock x:Name="QualityText" Text="质量: 100%" Foreground="#a0a0a0" FontSize="11" HorizontalAlignment="Center" Margin="0 5"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- 📝 底部：日志输出区 -->
+        <Border Grid.Row="2" Background="#0a0a1a" Margin="5 0 5 5" Padding="10" CornerRadius="8">
+            <ScrollViewer>
+                <TextBlock x:Name="LogText" Foreground="#4ecca3" FontFamily="Consolas" FontSize="11"/>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>

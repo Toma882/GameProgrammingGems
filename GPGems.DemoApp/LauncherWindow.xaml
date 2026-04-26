@@ -208,6 +208,126 @@
                     </Grid>
                 </Border>
 
+                <!-- 地形生成算法三剑合一 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#e67e22" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenTerrainGenerationDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="🏔️" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="地形生成算法三剑合一" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="断层 · 分形 · 粒子侵蚀" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="三画布实时对比" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- BSP 树空间分割 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#e74c3c" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenBSPTreeDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="🌳" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="BSP 树空间分割" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="多边形分割 · 画家算法" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="射线检测 · Portal可见性" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 多分辨率栅格 Chunked LOD -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#3498db" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenMultiresGridDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="📊" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="多分辨率栅格 Chunked LOD" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="块式分块 · 视距LOD切换" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="深度/距离双驱动" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 渐进网格 Progressive Mesh -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#9b59b6" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenProgressiveMeshDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="⚡" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="渐进网格 Progressive Mesh" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="边折叠 · 边分裂 · 误差计算" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="曲率权重 · 边界保护" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 连续LOD地形 CLOD Terrain -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#1abc9c" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenCLODTerrainDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="🏔️" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="连续LOD地形 ROAM" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="二叉三角剖分 · 自适应细化" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="视点驱动 · 逐帧优化" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 曲线插值对比 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#9b59b6" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenCurveInterpolationDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="📈" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="曲线插值对比" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Bezier / Hermite / Catmull-Rom" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="TCB 样条 · 动画轨迹" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- 噪声生成器 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#2ecc71" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenNoiseDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="🌫️" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="噪声生成器" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Perlin / Simplex 噪声" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="分形叠加 · 程序化地形" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- GJK 碰撞检测 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#e74c3c" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenGJKDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="⚡" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="GJK + EPA 碰撞检测" FontSize="16" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Minkowski 和 · Simplex 演化" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="穿透深度 · 碰撞法向量" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
             </WrapPanel>
         </ScrollViewer>
     </Grid>

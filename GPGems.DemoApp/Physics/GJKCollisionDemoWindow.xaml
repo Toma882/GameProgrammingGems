@@ -1,0 +1,154 @@
+<Window x:Class="GPGems.DemoApp.Physics.GJKCollisionDemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="⚡ GJK 碰撞检测 - Game Programming Gems"
+        Height="800" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#0f0f23">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+
+        <!-- 📖 顶部：算法说明区 -->
+        <Border Grid.Row="0" Background="#1a1a2e" Padding="15">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <TextBlock Text="⚡ GJK + EPA 碰撞检测" FontSize="18" Foreground="White" FontWeight="Bold"/>
+                    <TextBlock Text="Gilbert-Johnson-Keerthi 算法 + Expanding Polytope Algorithm - 现代游戏物理引擎核心" FontSize="12" Foreground="#a0a0a0" Margin="0 3"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="50 0 0 0" VerticalAlignment="Center">
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="CollisionStatus" Text="状态: 无碰撞" Foreground="#4ecca3" FontSize="12"/>
+                    </Border>
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4">
+                        <TextBlock x:Name="IterationText" Text="迭代: 0 次" Foreground="#f39c12" FontSize="12"/>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="260"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ⚙️ 左侧：参数调节区 -->
+            <Border Grid.Column="0" Background="#1a1a2e" Margin="5" Padding="15" CornerRadius="8">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="🎯 形状 A" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                        <TextBlock Text="形状类型" Foreground="#a0a0a0" FontSize="11" Margin="0 5 0 3"/>
+                        <ComboBox x:Name="ShapeAType" SelectionChanged="ShapeTypeChanged"
+                                  Background="#16213e" Foreground="White" BorderBrush="#333">
+                            <ComboBoxItem>圆形</ComboBoxItem>
+                            <ComboBoxItem IsSelected="True">矩形</ComboBoxItem>
+                            <ComboBoxItem>三角形</ComboBoxItem>
+                            <ComboBoxItem>六边形</ComboBoxItem>
+                        </ComboBox>
+
+                        <Slider x:Name="ScaleASlider" Minimum="20" Maximum="100" Value="50" Margin="0 10"
+                                Foreground="#4ecca3" ValueChanged="ParameterChanged"/>
+                        <TextBlock x:Name="ScaleAValue" Text="大小: 50" Foreground="White" FontSize="10"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <TextBlock Text="🎯 形状 B" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                        <TextBlock Text="形状类型" Foreground="#a0a0a0" FontSize="11" Margin="0 5 0 3"/>
+                        <ComboBox x:Name="ShapeBType" SelectionChanged="ShapeTypeChanged"
+                                  Background="#16213e" Foreground="White" BorderBrush="#333">
+                            <ComboBoxItem>圆形</ComboBoxItem>
+                            <ComboBoxItem IsSelected="True">矩形</ComboBoxItem>
+                            <ComboBoxItem>三角形</ComboBoxItem>
+                            <ComboBoxItem>六边形</ComboBoxItem>
+                        </ComboBox>
+
+                        <Slider x:Name="ScaleBSlider" Minimum="20" Maximum="100" Value="60" Margin="0 10"
+                                Foreground="#e94560" ValueChanged="ParameterChanged"/>
+                        <TextBlock x:Name="ScaleBValue" Text="大小: 60" Foreground="White" FontSize="10"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <CheckBox x:Name="ShowEPA" Content="显示 EPA 穿透深度" IsChecked="True"
+                                  Foreground="White" Margin="0 5" Checked="DisplayOptionChanged"/>
+
+                        <CheckBox x:Name="ShowMinkowski" Content="显示 Minkowski 和" IsChecked="False"
+                                  Foreground="White" Margin="0 5" Checked="DisplayOptionChanged"/>
+
+                        <CheckBox x:Name="ShowSimplex" Content="显示 Simplex 演化" IsChecked="True"
+                                  Foreground="White" Margin="0 5" Checked="DisplayOptionChanged"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <Button x:Name="ResetButton" Content="↺ 重置位置" Background="#4ecca3" Foreground="White"
+                                FontWeight="Bold" Padding="10" Margin="0 5" Click="ResetButton_Click"/>
+
+                        <Button x:Name="StepButton" Content="▶ 单步演示" Background="#e94560" Foreground="White"
+                                FontWeight="Bold" Padding="10" Margin="0 5" Click="StepButton_Click"/>
+
+                        <Button x:Name="AutoRotateButton" Content="🔄 自动旋转" Background="#f39c12" Foreground="White"
+                                FontWeight="Bold" Padding="10" Margin="0 5" Click="AutoRotateButton_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- 🖼️ 中央：主可视化区 -->
+            <Border Grid.Column="1" Background="#0a0a1a" Margin="5 5 5 0" CornerRadius="8">
+                <Canvas x:Name="DrawCanvas" Background="Transparent"
+                        MouseDown="DrawCanvas_MouseDown"
+                        MouseMove="DrawCanvas_MouseMove"
+                        MouseUp="DrawCanvas_MouseUp"/>
+            </Border>
+
+            <!-- 📊 右侧：信息区 -->
+            <Border Grid.Column="2" Background="#1a1a2e" Margin="5" Padding="15" CornerRadius="8">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="📚 算法说明" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 15"/>
+
+                        <TextBlock x:Name="AlgorithmTitle" Text="GJK 碰撞检测" FontSize="12" Foreground="#f39c12" FontWeight="Bold"/>
+                        <TextBlock x:Name="AlgorithmDesc"
+                                   Text="GJK 通过在 Minkowski 和空间中构建 Simplex（三角形/四面体）来检测碰撞。只需要 Support 函数就能工作，适用于所有凸形状。是 Bullet、Box2D、Havok 等引擎的核心算法。"
+                                   FontSize="11" Foreground="#a0a0a0" Margin="0 5 0 15"
+                                   TextWrapping="Wrap"/>
+
+                        <Separator Background="#333" Margin="0 10"/>
+
+                        <TextBlock Text="📐 EPA 穿透信息" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 5"/>
+                        <TextBlock x:Name="EPA_Depth" Text="穿透深度: 0" Foreground="#e94560" FontSize="11" Margin="0 2"/>
+                        <TextBlock x:Name="EPA_Normal" Text="法向量: (0, 0)" Foreground="#e94560" FontSize="11" Margin="0 2"/>
+                        <TextBlock x:Name="EPA_Faces" Text="多面体面数: 0" Foreground="#e94560" FontSize="11" Margin="0 2"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <TextBlock Text="💡 操作说明" FontSize="12" Foreground="#a0a0a0" Margin="0 5"/>
+                        <TextBlock Text="• 拖拽绿色形状: 移动形状 A" Foreground="#4ecca3" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="• 拖拽红色形状: 移动形状 B" Foreground="#e94560" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="• 碰撞时显示 EPA 法线箭头" Foreground="#666" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="• 单步模式查看 Simplex 演化" Foreground="#666" FontSize="10" Margin="0 2"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <TextBlock Text="🎮 性能" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 5"/>
+                        <TextBlock x:Name="Performance_GJK" Text="GJK: 0 ms" Foreground="#4ecca3" FontSize="11" Margin="0 2"/>
+                        <TextBlock x:Name="Performance_EPA" Text="EPA: 0 ms" Foreground="#e94560" FontSize="11" Margin="0 2"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- 📝 底部：日志输出区 -->
+        <Border Grid.Row="2" Background="#0a0a1a" Margin="5 0 5 5" Padding="10" CornerRadius="8">
+            <ScrollViewer>
+                <TextBlock x:Name="LogText" Foreground="#4ecca3" FontFamily="Consolas" FontSize="11"/>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>

@@ -1,3 +1,5 @@
+using System;
+using Math = System.Math;
 using System.Windows;
 using System.Windows.Input;
 using GPGems.AI.Boids;
@@ -135,7 +137,7 @@ public partial class BoidsDemoWindow : Window
             if (_predatorFlock != null)
             {
                 _predatorFlock.Boids.Clear();
-                _predatorFlock.SpawnBoids(Math.Max(5, (int)BoidCountSlider.Value / 5));
+                _predatorFlock.SpawnBoids(System.Math.Max(5, (int)BoidCountSlider.Value / 5));
             }
 
             // 恢复模式
@@ -217,7 +219,7 @@ public partial class BoidsDemoWindow : Window
         UpdateSettingsFromUI(); // 应用捕食者速度设置
 
         // 捕食者数量 = 猎物的 1/5
-        int predatorCount = Math.Max(3, _flock.Boids.Count / 5);
+        int predatorCount = System.Math.Max(3, _flock.Boids.Count / 5);
         _predatorFlock.SpawnBoids(predatorCount);
 
         // 猎物的敌人是捕食者（猎物逃跑）

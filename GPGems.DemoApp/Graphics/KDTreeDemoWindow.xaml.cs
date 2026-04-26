@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -77,17 +78,17 @@ public partial class KDTreeDemoWindow : Window
 
             for (int i = 0; i < clusterSize && _points.Count < count; i++)
             {
-                double theta = _random.NextDouble() * Math.PI * 2;
-                double phi = _random.NextDouble() * Math.PI;
+                double theta = _random.NextDouble() * System.Math.PI * 2;
+                double phi = _random.NextDouble() * System.Math.PI;
                 double radius = _random.NextDouble() * 35;
 
-                float x = cx + (float)(radius * Math.Sin(phi) * Math.Cos(theta));
-                float y = cy + (float)(radius * Math.Sin(phi) * Math.Sin(theta));
-                float z = cz + (float)(radius * Math.Cos(phi));
+                float x = cx + (float)(radius * System.Math.Sin(phi) * System.Math.Cos(theta));
+                float y = cy + (float)(radius * System.Math.Sin(phi) * System.Math.Sin(theta));
+                float z = cz + (float)(radius * System.Math.Cos(phi));
 
-                x = Math.Clamp(x, 10, SpaceSize - 10);
-                y = Math.Clamp(y, 10, SpaceSize - 10);
-                z = Math.Clamp(z, 10, SpaceSize - 10);
+                x = System.Math.Clamp(x, 10, SpaceSize - 10);
+                y = System.Math.Clamp(y, 10, SpaceSize - 10);
+                z = System.Math.Clamp(z, 10, SpaceSize - 10);
 
                 _points.Add(new Vector3(x, y, z));
             }
@@ -193,7 +194,7 @@ public partial class KDTreeDemoWindow : Window
 
     private void DrawSplitLine(Canvas canvas, KDTree<int>.Node node, int horizAxis, int vertAxis)
     {
-        double scale = Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         var bounds = node.Bounds;
@@ -215,8 +216,8 @@ public partial class KDTreeDemoWindow : Window
             // 只画在Canvas范围内的线
             if (lineX >= 0 && lineX <= canvasWidth)
             {
-                lineY1 = Math.Clamp(lineY1, 0, canvasHeight);
-                lineY2 = Math.Clamp(lineY2, 0, canvasHeight);
+                lineY1 = System.Math.Clamp(lineY1, 0, canvasHeight);
+                lineY2 = System.Math.Clamp(lineY2, 0, canvasHeight);
 
                 var line = new Line
                 {
@@ -245,8 +246,8 @@ public partial class KDTreeDemoWindow : Window
             // 只画在Canvas范围内的线
             if (lineY >= 0 && lineY <= canvasHeight)
             {
-                lineX1 = Math.Clamp(lineX1, 0, canvasWidth);
-                lineX2 = Math.Clamp(lineX2, 0, canvasWidth);
+                lineX1 = System.Math.Clamp(lineX1, 0, canvasWidth);
+                lineX2 = System.Math.Clamp(lineX2, 0, canvasWidth);
 
                 var line = new Line
                 {
@@ -277,7 +278,7 @@ public partial class KDTreeDemoWindow : Window
 
     private void DrawBoundsRect(Canvas canvas, Bounds bounds, double opacity)
     {
-        double scale = Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         double canvasWidth = canvas.ActualWidth;
@@ -340,7 +341,7 @@ public partial class KDTreeDemoWindow : Window
 
     private void DrawPoint(Canvas canvas, float x, float y, Brush color, double size = 2.5)
     {
-        double scale = Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         var ellipse = new Ellipse
@@ -385,7 +386,7 @@ public partial class KDTreeDemoWindow : Window
 
     private void HighlightNodeBounds(Canvas canvas, Bounds bounds, Brush brush)
     {
-        double scale = Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         var rect = new Rectangle
@@ -426,7 +427,7 @@ public partial class KDTreeDemoWindow : Window
     private void ViewXY_MouseMove(object sender, MouseEventArgs e)
     {
         var pos = e.GetPosition(ViewXY);
-        double scale = Math.Min(ViewXY.ActualWidth, ViewXY.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(ViewXY.ActualWidth, ViewXY.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         float x = (float)(pos.X / scale);
@@ -439,7 +440,7 @@ public partial class KDTreeDemoWindow : Window
     private void ViewXZ_MouseMove(object sender, MouseEventArgs e)
     {
         var pos = e.GetPosition(ViewXZ);
-        double scale = Math.Min(ViewXZ.ActualWidth, ViewXZ.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(ViewXZ.ActualWidth, ViewXZ.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         float x = (float)(pos.X / scale);
@@ -452,7 +453,7 @@ public partial class KDTreeDemoWindow : Window
     private void ViewYZ_MouseMove(object sender, MouseEventArgs e)
     {
         var pos = e.GetPosition(ViewYZ);
-        double scale = Math.Min(ViewYZ.ActualWidth, ViewYZ.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(ViewYZ.ActualWidth, ViewYZ.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         float y = (float)(pos.X / scale);

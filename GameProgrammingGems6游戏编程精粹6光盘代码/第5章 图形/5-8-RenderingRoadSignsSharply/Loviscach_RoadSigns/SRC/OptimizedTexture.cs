@@ -218,10 +218,10 @@ namespace BilevelTextureMagnification
 						}
 						
 						int jMin = 0;
-						int aMin = Math.Abs(sum[jMin]);
+						int aMin = System.Math.Abs(sum[jMin]);
 						for(int jj = 1; jj < downsampling; jj++)
 						{
-							int aSum = Math.Abs(sum[jj]);
+							int aSum = System.Math.Abs(sum[jj]);
 							if(aSum < aMin)
 							{
 								jMin = jj;
@@ -246,10 +246,10 @@ namespace BilevelTextureMagnification
 						}
 						
 						int iMin = 0;
-						int aMin = Math.Abs(sum[iMin]);
+						int aMin = System.Math.Abs(sum[iMin]);
 						for(int ii = 1; ii < downsampling; ii++)
 						{
-							int aSum = Math.Abs(sum[ii]);
+							int aSum = System.Math.Abs(sum[ii]);
 							if(aSum < aMin)
 							{
 								iMin = ii;
@@ -447,18 +447,18 @@ namespace BilevelTextureMagnification
 			double s1 = 0.0;
 			if(i >= 1)
 			{
-				s1 = Math.Atan(((optimizedArrayWork[j-1, i-1]-128) * (optimizedArrayWork[j, i]-128)
+				s1 = System.Math.Atan(((optimizedArrayWork[j-1, i-1]-128) * (optimizedArrayWork[j, i]-128)
 					-(optimizedArrayWork[j, i-1]-128) * (optimizedArrayWork[j-1, i]-128)
 					)/square(optimizedArrayWork[j-1, i] - optimizedArrayWork[j, i]));
 			}
 			double s2 = 0.0;
 			if(i <= w-2)
 			{
-				s2 = Math.Atan(	-((optimizedArrayWork[j-1, i+1]-128) * (optimizedArrayWork[j, i]-128)
+				s2 = System.Math.Atan(	-((optimizedArrayWork[j-1, i+1]-128) * (optimizedArrayWork[j, i]-128)
 					-(optimizedArrayWork[j, i+1]-128) * (optimizedArrayWork[j-1, i]-128)
 					)/square(optimizedArrayWork[j-1, i] - optimizedArrayWork[j, i]));
 			}
-			double dir = Math.Atan(dirVert[j, i]);
+			double dir = System.Math.Atan(dirVert[j, i]);
 			double angleDist = square(s1-dir) + square(s2-dir);
 			double locationDist = square(
 				(optimizedArrayWork[j-1, i] - 128)/(double)(optimizedArrayWork[j-1, i] - optimizedArrayWork[j, i])
@@ -483,18 +483,18 @@ namespace BilevelTextureMagnification
 			double s1 = 0.0;
 			if(j >= 1)
 			{
-				s1 = Math.Atan(((optimizedArrayWork[j-1, i-1]-128) * (optimizedArrayWork[j, i]-128)
+				s1 = System.Math.Atan(((optimizedArrayWork[j-1, i-1]-128) * (optimizedArrayWork[j, i]-128)
 					-(optimizedArrayWork[j-1, i]-128) * (optimizedArrayWork[j, i-1]-128)
 					)/square(optimizedArrayWork[j, i-1] - optimizedArrayWork[j, i]));
 			}
 			double s2 = 0.0;
 			if(j <= h-2)
 			{
-				s2 = Math.Atan(-((optimizedArrayWork[j+1, i-1]-128) * (optimizedArrayWork[j, i]-128)
+				s2 = System.Math.Atan(-((optimizedArrayWork[j+1, i-1]-128) * (optimizedArrayWork[j, i]-128)
 					-(optimizedArrayWork[j+1, i]-128) * (optimizedArrayWork[j, i-1]-128)
 					)/square(optimizedArrayWork[j, i-1] - optimizedArrayWork[j, i]));
 			}
-			double dir = Math.Atan(dirHoriz[j, i]);
+			double dir = System.Math.Atan(dirHoriz[j, i]);
 			double angleDist = square(s1-dir) + square(s2-dir);
 			double locationDist = square(
 				(optimizedArrayWork[j, i-1] - 128)/(double)(optimizedArrayWork[j, i-1] - optimizedArrayWork[j, i])

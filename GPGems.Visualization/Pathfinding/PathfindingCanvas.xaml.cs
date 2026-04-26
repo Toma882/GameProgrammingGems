@@ -134,8 +134,8 @@ public partial class PathfindingCanvas : UserControl
         GridCanvas.Children.Clear();
         _cellRects.Clear();
 
-        double cellSize = Math.Min(ActualWidth, ActualHeight) / Math.Max(_map.Width, _map.Height);
-        cellSize = Math.Max(cellSize, 8);
+        double cellSize = System.Math.Min(ActualWidth, ActualHeight) / System.Math.Max(_map.Width, _map.Height);
+        cellSize = System.Math.Max(cellSize, 8);
 
         for (int y = 0; y < _map.Height; y++)
         {
@@ -197,7 +197,7 @@ public partial class PathfindingCanvas : UserControl
         if (_map == null) return;
 
         var pos = e.GetPosition(GridCanvas);
-        double cellSize = Math.Min(ActualWidth, ActualHeight) / Math.Max(_map.Width, _map.Height);
+        double cellSize = System.Math.Min(ActualWidth, ActualHeight) / System.Math.Max(_map.Width, _map.Height);
 
         int x = (int)(pos.X / cellSize);
         int y = (int)(pos.Y / cellSize);
@@ -244,7 +244,7 @@ public partial class PathfindingCanvas : UserControl
         if (CurrentMode != EditMode.Obstacle) return;
 
         var pos = e.GetPosition(GridCanvas);
-        double cellSize = Math.Min(ActualWidth, ActualHeight) / Math.Max(_map.Width, _map.Height);
+        double cellSize = System.Math.Min(ActualWidth, ActualHeight) / System.Math.Max(_map.Width, _map.Height);
 
         int x = (int)(pos.X / cellSize);
         int y = (int)(pos.Y / cellSize);

@@ -1,0 +1,204 @@
+<Window x:Class="GPGems.DemoApp.Graphics.TerrainGenerationDemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="🏔️ 地形生成算法对比 - Game Programming Gems"
+        Height="850" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#0f0f23">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="80"/>
+        </Grid.RowDefinitions>
+
+        <!-- 📖 顶部：算法说明区 -->
+        <Border Grid.Row="0" Background="#1a1a2e" Padding="15">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <TextBlock Text="🏔️ 地形生成算法三剑合一" FontSize="18" Foreground="White" FontWeight="Bold"/>
+                    <TextBlock Text="GPG 1 - 17/18/19 Shankel | 断层生成 · 中点位移分形 · 粒子沉积侵蚀" FontSize="12" Foreground="#a0a0a0" Margin="0 3"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="50 0 0 0" VerticalAlignment="Center">
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="FaultTimeText" Text="断层: 0 ms" Foreground="#e94560" FontSize="12"/>
+                    </Border>
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="MidpointTimeText" Text="分形: 0 ms" Foreground="#4ecca3" FontSize="12"/>
+                    </Border>
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4">
+                        <TextBlock x:Name="ErosionTimeText" Text="侵蚀: 0 ms" Foreground="#f39c12" FontSize="12"/>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ⚙️ 左侧：参数调节区 -->
+            <Border Grid.Column="0" Background="#1a1a2e" Margin="5" Padding="15" CornerRadius="8">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="⚙️ 全局参数" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 15"/>
+
+                        <!-- 地形尺寸 -->
+                        <TextBlock Text="地形细分级别 (size=2^level+1)" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="LevelSlider" Minimum="5" Maximum="10" Value="7"
+                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                Foreground="#4ecca3"/>
+                        <TextBlock x:Name="LevelValue" Text="129x129" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <!-- 随机种子 -->
+                        <TextBlock Text="随机种子 (-1=随机)" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="SeedSlider" Minimum="-1" Maximum="1000" Value="42"
+                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                Foreground="#4ecca3"/>
+                        <TextBlock x:Name="SeedValue" Text="42" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <!-- 显示模式 -->
+                        <TextBlock Text="显示模式" Foreground="#a0a0a0" FontSize="11" Margin="0 15 0 5"/>
+                        <RadioButton x:Name="HeightColorMode" Content="高度着色" IsChecked="True"
+                                     Foreground="White" Margin="0 2" Click="DisplayModeChanged"/>
+                        <RadioButton x:Name="GrayscaleMode" Content="灰度高度图"
+                                     Foreground="White" Margin="0 2" Click="DisplayModeChanged"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <TextBlock Text="🔴 断层生成参数" FontSize="13" Foreground="#e94560" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                        <TextBlock Text="断层数量" Foreground="#a0a0a0" FontSize="11" Margin="0 5 0 3"/>
+                        <Slider x:Name="FaultCountSlider" Minimum="10" Maximum="500" Value="150"
+                                TickFrequency="10" IsSnapToTickEnabled="True"
+                                Foreground="#e94560"/>
+                        <TextBlock x:Name="FaultCountValue" Text="150" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <TextBlock Text="平滑半径" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="FilterRadiusSlider" Minimum="0" Maximum="1" Value="0.3"
+                                TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                Foreground="#e94560"/>
+                        <TextBlock x:Name="FilterRadiusValue" Text="0.3" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <TextBlock Text="🟢 分形地形参数" FontSize="13" Foreground="#4ecca3" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                        <TextBlock Text="粗糙度" Foreground="#a0a0a0" FontSize="11" Margin="0 5 0 3"/>
+                        <Slider x:Name="RoughnessSlider" Minimum="0.1" Maximum="0.9" Value="0.5"
+                                TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                Foreground="#4ecca3"/>
+                        <TextBlock x:Name="RoughnessValue" Text="0.5" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <TextBlock Text="🟡 粒子侵蚀参数" FontSize="13" Foreground="#f39c12" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                        <TextBlock Text="粒子数量 (万)" Foreground="#a0a0a0" FontSize="11" Margin="0 5 0 3"/>
+                        <Slider x:Name="ParticleCountSlider" Minimum="1" Maximum="20" Value="5"
+                                TickFrequency="1" IsSnapToTickEnabled="True"
+                                Foreground="#f39c12"/>
+                        <TextBlock x:Name="ParticleCountValue" Text="5万" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <TextBlock Text="侵蚀强度" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="ErosionRateSlider" Minimum="0.1" Maximum="1" Value="0.3"
+                                TickFrequency="0.05" IsSnapToTickEnabled="True"
+                                Foreground="#f39c12"/>
+                        <TextBlock x:Name="ErosionRateValue" Text="0.3" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <Button x:Name="RegenerateAllButton" Content="🔄 生成全部地形"
+                                Background="#e94560" Foreground="White" FontWeight="Bold"
+                                Padding="10" Margin="0 20 0 5" Click="RegenerateAllButton_Click"/>
+
+                        <Button x:Name="ApplyErosionButton" Content="💧 仅应用侵蚀"
+                                Background="#f39c12" Foreground="White" FontWeight="Bold"
+                                Padding="10" Margin="0 5" Click="ApplyErosionButton_Click"/>
+
+                        <TextBlock Text="📋 预设方案" Foreground="#a0a0a0" FontSize="11" Margin="0 20 0 10"/>
+
+                        <Button Content="⛰️ 山地" Background="#16213e" Foreground="White"
+                                Padding="8" Margin="0 2" Click="PresetMountains_Click"/>
+
+                        <Button Content="🌊 丘陵湖泊" Background="#16213e" Foreground="White"
+                                Padding="8" Margin="0 2" Click="PresetHills_Click"/>
+
+                        <Button Content="🏜️ 峡谷侵蚀" Background="#16213e" Foreground="White"
+                                Padding="8" Margin="0 2" Click="PresetCanyon_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- 🖼️ 中央1：断层地形 -->
+            <Border Grid.Column="1" Background="#0a0a1a" Margin="2 5 2 0" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="#e94560" Padding="8" CornerRadius="8 8 0 0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🔴 断层生成" FontSize="14" Foreground="White" FontWeight="Bold"/>
+                            <TextBlock x:Name="FaultTimeValue" Text="0ms" Foreground="White" FontSize="12" Margin="15 2 0 0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Canvas x:Name="FaultCanvas" Grid.Row="1" Background="Transparent"/>
+                </Grid>
+            </Border>
+
+            <!-- 🖼️ 中央2：分形地形 -->
+            <Border Grid.Column="2" Background="#0a0a1a" Margin="2 5 2 0" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="#4ecca3" Padding="8" CornerRadius="8 8 0 0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🟢 中点位移分形" FontSize="14" Foreground="White" FontWeight="Bold"/>
+                            <TextBlock x:Name="MidpointTimeValue" Text="0ms" Foreground="White" FontSize="12" Margin="15 2 0 0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Canvas x:Name="MidpointCanvas" Grid.Row="1" Background="Transparent"/>
+                </Grid>
+            </Border>
+
+            <!-- 🖼️ 中央3：侵蚀地形 -->
+            <Border Grid.Column="3" Background="#0a0a1a" Margin="2 5 2 0" CornerRadius="8">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Background="#f39c12" Padding="8" CornerRadius="8 8 0 0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="🟡 粒子沉积侵蚀" FontSize="14" Foreground="White" FontWeight="Bold"/>
+                            <TextBlock x:Name="ErosionTimeValue" Text="0ms" Foreground="White" FontSize="12" Margin="15 2 0 0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <Canvas x:Name="ErosionCanvas" Grid.Row="1" Background="Transparent"/>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- 📝 底部：日志输出区 -->
+        <Border Grid.Row="2" Background="#0a0a1a" Margin="5 0 5 5" Padding="10" CornerRadius="8">
+            <ScrollViewer>
+                <TextBlock x:Name="LogText" Foreground="#4ecca3" FontFamily="Consolas" FontSize="11"/>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>

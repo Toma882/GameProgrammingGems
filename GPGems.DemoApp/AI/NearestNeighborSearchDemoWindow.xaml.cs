@@ -33,11 +33,15 @@ public partial class NearestNeighborSearchDemoWindow : Window
         { "全部对比", "同时运行所有算法，对比性能和精度" },
     };
 
+    private bool _isLoaded = false;
+
     public NearestNeighborSearchDemoWindow()
     {
         InitializeComponent();
         Loaded += (_, _) =>
         {
+            _isLoaded = true;
+            OnSettingsChanged(null, null);
             AlgoBruteForce.IsChecked = true;
             RegenerateData();
         };
@@ -47,7 +51,10 @@ public partial class NearestNeighborSearchDemoWindow : Window
 
     private void OnAlgorithmChanged(object sender, RoutedEventArgs e)
     {
-        var algoName = ((RadioButton)sender).Content.ToString();
+        // 防止 XAML 初始化期间触发空引用
+        if (!_isLoaded || sender == null) return;
+
+        if (((RadioButton)sender).Content is not string algoName) return;
         if (_algorithmDescriptions.TryGetValue(algoName, out var desc))
         {
             AlgorithmDescText.Text = desc;
@@ -62,6 +69,8 @@ public partial class NearestNeighborSearchDemoWindow : Window
 
     private void OnSettingsChanged(object sender, RoutedEventArgs e)
     {
+        if (!_isLoaded) return;
+
         PointCountText.Text = ((int)PointCountSlider.Value).ToString();
         DimensionText.Text = ((int)DimensionSlider.Value).ToString();
         KValueText.Text = ((int)KValueSlider.Value).ToString();

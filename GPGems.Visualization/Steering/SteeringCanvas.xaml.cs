@@ -250,7 +250,7 @@ public partial class SteeringCanvas : UserControl, IDisposable
         if (_agent == null || !_isRunning) return;
 
         // 时间缩放
-        int steps = Math.Max(1, (int)TimeScale);
+        int steps = System.Math.Max(1, (int)TimeScale);
         for (int i = 0; i < steps; i++)
         {
             // 对于需要移动目标的行为，更新目标智能体

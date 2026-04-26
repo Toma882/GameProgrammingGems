@@ -1,0 +1,150 @@
+<Window x:Class="GPGems.DemoApp.Math.NoiseGenerationDemoWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="🌫️ 噪声生成器 - Game Programming Gems"
+        Height="800" Width="1400"
+        WindowStartupLocation="CenterScreen"
+        Background="#0f0f23">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="100"/>
+        </Grid.RowDefinitions>
+
+        <!-- 📖 顶部：算法说明区 -->
+        <Border Grid.Row="0" Background="#1a1a2e" Padding="15">
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <TextBlock Text="🌫️ 噪声生成器" FontSize="18" Foreground="White" FontWeight="Bold"/>
+                    <TextBlock Text="Perlin / Simplex 噪声 - 程序化地形、纹理、粒子动画的核心" FontSize="12" Foreground="#a0a0a0" Margin="0 3"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="50 0 0 0" VerticalAlignment="Center">
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4" Margin="0 0 10 0">
+                        <TextBlock x:Name="ResolutionText" Text="分辨率: 256x256" Foreground="#4ecca3" FontSize="12"/>
+                    </Border>
+                    <Border Background="#16213e" Padding="10 5" CornerRadius="4">
+                        <TextBlock x:Name="GenTimeText" Text="生成时间: 0 ms" Foreground="#e94560" FontSize="12"/>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="260"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ⚙️ 左侧：参数调节区 -->
+            <Border Grid.Column="0" Background="#1a1a2e" Margin="5" Padding="15" CornerRadius="8">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="⚙️ 噪声类型" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 15"/>
+
+                        <RadioButton x:Name="TypePerlin" Content="Perlin 噪声" Foreground="White" GroupName="NoiseType"
+                                     IsChecked="True" Margin="0 5" Checked="NoiseTypeChanged"/>
+                        <RadioButton x:Name="TypeSimplex" Content="Simplex 噪声" Foreground="White" GroupName="NoiseType"
+                                     Margin="0 5" Checked="NoiseTypeChanged"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <TextBlock Text="🎛️ 参数调节" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                        <TextBlock Text="缩放 Scale" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="ScaleSlider" Minimum="0.01" Maximum="0.1" Value="0.02" TickFrequency="0.01"
+                                Foreground="#4ecca3" ValueChanged="ParameterChanged"/>
+                        <TextBlock x:Name="ScaleValue" Text="0.02" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <TextBlock Text="八度 Octaves" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="OctavesSlider" Minimum="1" Maximum="8" Value="4" TickFrequency="1"
+                                IsSnapToTickEnabled="True" Foreground="#4ecca3" ValueChanged="ParameterChanged"/>
+                        <TextBlock x:Name="OctavesValue" Text="4" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <TextBlock Text="持久度 Persistence" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <Slider x:Name="PersistenceSlider" Minimum="0.1" Maximum="1" Value="0.5" TickFrequency="0.1"
+                                Foreground="#4ecca3" ValueChanged="ParameterChanged"/>
+                        <TextBlock x:Name="PersistenceValue" Text="0.50" Foreground="White" FontSize="10" HorizontalAlignment="Right"/>
+
+                        <TextBlock Text="分辨率" Foreground="#a0a0a0" FontSize="11" Margin="0 10 0 3"/>
+                        <ComboBox x:Name="ResolutionCombo" SelectionChanged="ResolutionChanged"
+                                  Background="#16213e" Foreground="White" BorderBrush="#333">
+                            <ComboBoxItem>64x64</ComboBoxItem>
+                            <ComboBoxItem IsSelected="True">256x256</ComboBoxItem>
+                            <ComboBoxItem>512x512</ComboBoxItem>
+                        </ComboBox>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <TextBlock Text="🎨 着色模式" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                        <RadioButton x:Name="ColorGrayscale" Content="灰度" Foreground="White" GroupName="ColorMode"
+                                     IsChecked="True" Margin="0 3" Checked="ColorModeChanged"/>
+                        <RadioButton x:Name="ColorTerrain" Content="地形" Foreground="White" GroupName="ColorMode"
+                                     Margin="0 3" Checked="ColorModeChanged"/>
+                        <RadioButton x:Name="ColorHeat" Content="热力图" Foreground="White" GroupName="ColorMode"
+                                     Margin="0 3" Checked="ColorModeChanged"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <Button x:Name="RegenerateButton" Content="🔄 重新生成" Background="#4ecca3" Foreground="White"
+                                FontWeight="Bold" Padding="10" Margin="0 5" Click="RegenerateButton_Click"/>
+
+                        <Button x:Name="AnimateButton" Content="▶ 3D 动画" Background="#e94560" Foreground="White"
+                                FontWeight="Bold" Padding="10" Margin="0 5" Click="AnimateButton_Click"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!-- 🖼️ 中央：主可视化区 -->
+            <Border Grid.Column="1" Background="#0a0a1a" Margin="5 5 5 0" CornerRadius="8">
+                <Grid>
+                    <Image x:Name="NoiseImage" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <Canvas x:Name="OverlayCanvas"/>
+                </Grid>
+            </Border>
+
+            <!-- 📊 右侧：信息区 -->
+            <Border Grid.Column="2" Background="#1a1a2e" Margin="5" Padding="15" CornerRadius="8">
+                <ScrollViewer>
+                    <StackPanel>
+                        <TextBlock Text="📚 算法说明" FontSize="14" Foreground="White" FontWeight="Bold" Margin="0 0 0 15"/>
+
+                        <TextBlock x:Name="AlgorithmTitle" Text="Perlin 噪声" FontSize="12" Foreground="#f39c12" FontWeight="Bold"/>
+                        <TextBlock x:Name="AlgorithmDesc"
+                                   Text="Ken Perlin 1985年发明的经典梯度噪声。通过网格点的伪随机梯度向量插值生成平滑的自然噪声，是程序化内容生成的基石。"
+                                   FontSize="11" Foreground="#a0a0a0" Margin="0 5 0 15"
+                                   TextWrapping="Wrap"/>
+
+                        <Separator Background="#333" Margin="0 10"/>
+
+                        <TextBlock Text="📐 噪声统计" FontSize="12" Foreground="White" FontWeight="Bold" Margin="0 5"/>
+                        <TextBlock x:Name="StatsMin" Text="最小值: 0" Foreground="#4ecca3" FontSize="11" Margin="0 2"/>
+                        <TextBlock x:Name="StatsMax" Text="最大值: 0" Foreground="#4ecca3" FontSize="11" Margin="0 2"/>
+                        <TextBlock x:Name="StatsMean" Text="平均值: 0" Foreground="#4ecca3" FontSize="11" Margin="0 2"/>
+                        <TextBlock x:Name="StatsStdDev" Text="标准差: 0" Foreground="#4ecca3" FontSize="11" Margin="0 2"/>
+
+                        <Separator Background="#333" Margin="0 15"/>
+
+                        <TextBlock Text="💡 典型应用" FontSize="12" Foreground="#a0a0a0" Margin="0 5"/>
+                        <TextBlock Text="• 地形高度图生成" Foreground="#666" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="• 云/雾/火焰等体积纹理" Foreground="#666" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="• 水面波纹动画" Foreground="#666" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="• 材质纹理扰动" Foreground="#666" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="• 相机抖动效果" Foreground="#666" FontSize="10" Margin="0 2"/>
+                        <TextBlock Text="• 粒子运动随机性" Foreground="#666" FontSize="10" Margin="0 2"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- 📝 底部：日志输出区 -->
+        <Border Grid.Row="2" Background="#0a0a1a" Margin="5 0 5 5" Padding="10" CornerRadius="8">
+            <ScrollViewer>
+                <TextBlock x:Name="LogText" Foreground="#4ecca3" FontFamily="Consolas" FontSize="11"/>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>

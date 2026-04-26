@@ -78,4 +78,52 @@ public partial class LauncherWindow : Window
     {
         new AI.NearestNeighborSearchDemoWindow().Show();
     }
+
+    /// <summary>打开地形生成算法三剑合一大对比</summary>
+    private void OpenTerrainGenerationDemo(object sender, RoutedEventArgs e)
+    {
+        new Graphics.TerrainGenerationDemoWindow().Show();
+    }
+
+    /// <summary>打开 BSP 树空间分割演示</summary>
+    private void OpenBSPTreeDemo(object sender, RoutedEventArgs e)
+    {
+        new Graphics.BSPTreeDemoWindow().Show();
+    }
+
+    /// <summary>打开多分辨率栅格 Chunked LOD 演示</summary>
+    private void OpenMultiresGridDemo(object sender, RoutedEventArgs e)
+    {
+        new Graphics.MultiresGridDemoWindow().Show();
+    }
+
+    /// <summary>打开渐进网格 Progressive Mesh 演示</summary>
+    private void OpenProgressiveMeshDemo(object sender, RoutedEventArgs e)
+    {
+        new Graphics.ProgressiveMeshDemoWindow().Show();
+    }
+
+    /// <summary>打开连续LOD地形演示</summary>
+    private void OpenCLODTerrainDemo(object sender, RoutedEventArgs e)
+    {
+        new Graphics.CLODTerrainDemoWindow().Show();
+    }
+
+    /// <summary>打开曲线插值对比演示</summary>
+    private void OpenCurveInterpolationDemo(object sender, RoutedEventArgs e)
+    {
+        new Math.CurveInterpolationDemoWindow().Show();
+    }
+
+    /// <summary>打开噪声生成器演示</summary>
+    private void OpenNoiseDemo(object sender, RoutedEventArgs e)
+    {
+        new Math.NoiseGenerationDemoWindow().Show();
+    }
+
+    /// <summary>打开 GJK 碰撞检测演示</summary>
+    private void OpenGJKDemo(object sender, RoutedEventArgs e)
+    {
+        new Physics.GJKCollisionDemoWindow().Show();
+    }
 }

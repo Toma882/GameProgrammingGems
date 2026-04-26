@@ -1,3 +1,5 @@
+using System;
+using Math = System.Math;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -112,17 +114,17 @@ public partial class OctreeDemoWindow : Window
             for (int i = 0; i < clusterSize && _points.Count < count; i++)
             {
                 // 球形分布
-                double theta = _random.NextDouble() * Math.PI * 2;
-                double phi = _random.NextDouble() * Math.PI;
+                double theta = _random.NextDouble() * System.Math.PI * 2;
+                double phi = _random.NextDouble() * System.Math.PI;
                 double radius = _random.NextDouble() * 40;
 
-                float x = cx + (float)(radius * Math.Sin(phi) * Math.Cos(theta));
-                float y = cy + (float)(radius * Math.Sin(phi) * Math.Sin(theta));
-                float z = cz + (float)(radius * Math.Cos(phi));
+                float x = cx + (float)(radius * System.Math.Sin(phi) * System.Math.Cos(theta));
+                float y = cy + (float)(radius * System.Math.Sin(phi) * System.Math.Sin(theta));
+                float z = cz + (float)(radius * System.Math.Cos(phi));
 
-                x = Math.Clamp(x, 10, SpaceSize - 10);
-                y = Math.Clamp(y, 10, SpaceSize - 10);
-                z = Math.Clamp(z, 10, SpaceSize - 10);
+                x = System.Math.Clamp(x, 10, SpaceSize - 10);
+                y = System.Math.Clamp(y, 10, SpaceSize - 10);
+                z = System.Math.Clamp(z, 10, SpaceSize - 10);
 
                 _points.Add(new Vector3(x, y, z));
             }
@@ -206,7 +208,7 @@ public partial class OctreeDemoWindow : Window
         {
             var bounds = node.Bounds;
             Color color = ShowDepthColorsCheck.IsChecked == true
-                ? DepthColors[Math.Min(node.Depth, DepthColors.Length - 1)]
+                ? DepthColors[System.Math.Min(node.Depth, DepthColors.Length - 1)]
                 : Color.FromRgb(100, 100, 150);
 
             var brush = new SolidColorBrush(color) { Opacity = 0.15 };
@@ -250,7 +252,7 @@ public partial class OctreeDemoWindow : Window
     private void DrawRect(Canvas canvas, float x, float y, float width, float height, Brush fill, Brush stroke)
     {
         // 缩放以适应画布
-        double scale = Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         var rect = new Rectangle
@@ -269,7 +271,7 @@ public partial class OctreeDemoWindow : Window
 
     private void DrawPoint(Canvas canvas, float x, float y, Brush color)
     {
-        double scale = Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         var ellipse = new Ellipse
@@ -302,7 +304,7 @@ public partial class OctreeDemoWindow : Window
     private void ViewXY_MouseMove(object sender, MouseEventArgs e)
     {
         var pos = e.GetPosition(ViewXY);
-        double scale = Math.Min(ViewXY.ActualWidth, ViewXY.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(ViewXY.ActualWidth, ViewXY.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         float x = (float)(pos.X / scale);
@@ -315,7 +317,7 @@ public partial class OctreeDemoWindow : Window
     private void ViewXZ_MouseMove(object sender, MouseEventArgs e)
     {
         var pos = e.GetPosition(ViewXZ);
-        double scale = Math.Min(ViewXZ.ActualWidth, ViewXZ.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(ViewXZ.ActualWidth, ViewXZ.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         float x = (float)(pos.X / scale);
@@ -328,7 +330,7 @@ public partial class OctreeDemoWindow : Window
     private void ViewYZ_MouseMove(object sender, MouseEventArgs e)
     {
         var pos = e.GetPosition(ViewYZ);
-        double scale = Math.Min(ViewYZ.ActualWidth, ViewYZ.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(ViewYZ.ActualWidth, ViewYZ.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         float y = (float)(pos.X / scale);
@@ -385,7 +387,7 @@ public partial class OctreeDemoWindow : Window
         }
 
         // 绘制查询范围框
-        double scale = Math.Min(ViewXY.ActualWidth, ViewXY.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(ViewXY.ActualWidth, ViewXY.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         // XY
@@ -403,7 +405,7 @@ public partial class OctreeDemoWindow : Window
 
     private void DrawPoint(Canvas canvas, float x, float y, Brush color, double size = 3)
     {
-        double scale = Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
+        double scale = System.Math.Min(canvas.ActualWidth, canvas.ActualHeight) / SpaceSize;
         if (scale <= 0) scale = 0.8;
 
         var ellipse = new Ellipse

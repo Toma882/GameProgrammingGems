@@ -1,3 +1,5 @@
+using System;
+using Math = System.Math;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -64,7 +66,7 @@ public partial class KnnRegressionDemoWindow : Window
         _dataPoints.Clear();
         for (float x = 0; x <= 10; x += 0.3f)
         {
-            float y = (float)Math.Sin(x * 0.8) * 5 + 5 + (float)(_random.NextDouble() * 1 - 0.5);
+            float y = (float)System.Math.Sin(x * 0.8) * 5 + 5 + (float)(_random.NextDouble() * 1 - 0.5);
             _dataPoints.Add((x, y));
         }
         _dataMinX = 0; _dataMaxX = 10;
@@ -92,7 +94,7 @@ public partial class KnnRegressionDemoWindow : Window
         for (float attack = 10; attack <= 200; attack += 8)
         {
             // 伤害 = 攻击 * (1 - e^(-攻击/50))
-            float damage = attack * (1 - (float)Math.Exp(-attack / 50)) + (float)(_random.NextDouble() * 10 - 5);
+            float damage = attack * (1 - (float)System.Math.Exp(-attack / 50)) + (float)(_random.NextDouble() * 10 - 5);
             _dataPoints.Add((attack, damage));
         }
         _dataMinX = 0; _dataMaxX = 210;

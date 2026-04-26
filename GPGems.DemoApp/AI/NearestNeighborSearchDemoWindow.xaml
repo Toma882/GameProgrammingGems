@@ -91,7 +91,7 @@
                     <!-- 数据点数量 -->
                     <TextBlock Foreground="#a0a0a0" Margin="0 10 0 5">数据点数量</TextBlock>
                     <DockPanel>
-                        <Slider x:Name="PointCountSlider" Minimum="100" Maximum="10000" Value="1000"
+                        <Slider x:Name="PointCountSlider" Minimum="100" Maximum="100000" Value="1000"
                                 TickFrequency="100" IsSnapToTickEnabled="True"
                                 DockPanel.Dock="Left" Width="150"
                                 ValueChanged="OnSettingsChanged"/>

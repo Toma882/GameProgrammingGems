@@ -100,7 +100,7 @@ public partial class BoidsCanvas : UserControl, IDisposable
 
         float scaleX = (float)ActualWidth / worldWidth * 0.8f;
         float scaleY = (float)ActualHeight / worldHeight * 0.8f;
-        float scale = Math.Min(scaleX, scaleY);
+        float scale = System.Math.Min(scaleX, scaleY);
 
         float offsetX = (float)ActualWidth / 2;
         float offsetY = (float)ActualHeight / 2;
@@ -121,7 +121,7 @@ public partial class BoidsCanvas : UserControl, IDisposable
         BeforeUpdate?.Invoke();
 
         // 时间缩放：每帧跳过多帧
-        int steps = Math.Max(1, (int)(TimeScale * 2));
+        int steps = System.Math.Max(1, (int)(TimeScale * 2));
         for (int i = 0; i < steps; i++)
         {
             _flock.Update();
@@ -231,7 +231,7 @@ public partial class BoidsCanvas : UserControl, IDisposable
         // 基础缩放：将世界坐标映射到画布（保留80%边距）
         float scaleX = (float)ActualWidth / worldWidth * 0.8f;
         float scaleY = (float)ActualHeight / worldHeight * 0.8f;
-        float scale = Math.Min(scaleX, scaleY);
+        float scale = System.Math.Min(scaleX, scaleY);
 
         // 更新目标点标记
         if (_targetMarker != null && _flock.GroupTarget.HasValue)
@@ -274,7 +274,7 @@ public partial class BoidsCanvas : UserControl, IDisposable
             Canvas.SetTop(shapes[i], y - shapes[i].Height / 2);
 
             // 速度越快，越透明（减少密集时的混乱）
-            shapes[i].Opacity = Math.Max(0.5, 0.95 - boid.Speed * 0.02);
+            shapes[i].Opacity = System.Math.Max(0.5, 0.95 - boid.Speed * 0.02);
         }
     }
 

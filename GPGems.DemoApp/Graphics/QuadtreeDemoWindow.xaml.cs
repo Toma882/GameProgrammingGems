@@ -118,12 +118,12 @@ public partial class QuadtreeDemoWindow : Window
 
             for (int i = 0; i < clusterSize && _points.Count < count; i++)
             {
-                double angle = _random.NextDouble() * Math.PI * 2;
+                double angle = _random.NextDouble() * System.Math.PI * 2;
                 double radius = _random.NextDouble() * 80;
-                float x = cx + (float)(Math.Cos(angle) * radius);
-                float y = cy + (float)(Math.Sin(angle) * radius);
-                x = Math.Clamp(x, 10, CanvasSize - 10);
-                y = Math.Clamp(y, 10, CanvasSize - 10);
+                float x = cx + (float)(System.Math.Cos(angle) * radius);
+                float y = cy + (float)(System.Math.Sin(angle) * radius);
+                x = System.Math.Clamp(x, 10, CanvasSize - 10);
+                y = System.Math.Clamp(y, 10, CanvasSize - 10);
                 _points.Add(new Vector3(x, y, 0));
             }
         }
@@ -190,7 +190,7 @@ public partial class QuadtreeDemoWindow : Window
 
                 if (ShowDepthColorsCheck.IsChecked == true)
                 {
-                    int colorIndex = Math.Min(leaf.Depth, DepthColors.Length - 1);
+                    int colorIndex = System.Math.Min(leaf.Depth, DepthColors.Length - 1);
                     rect.Fill = new SolidColorBrush(DepthColors[colorIndex]);
                     rect.Stroke = new SolidColorBrush(Color.FromRgb(100, 100, 100));
                 }
