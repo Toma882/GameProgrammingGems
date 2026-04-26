@@ -72,4 +72,10 @@ public partial class LauncherWindow : Window
     {
         new AI.NearestNeighborBenchmarkWindow().Show();
     }
+
+    /// <summary>打开最近邻搜索多算法对比演示</summary>
+    private void OpenNearestNeighborSearchDemo(object sender, RoutedEventArgs e)
+    {
+        new AI.NearestNeighborSearchDemoWindow().Show();
+    }
 }

@@ -193,6 +193,21 @@
                     </Grid>
                 </Border>
 
+                <!-- 最近邻搜索多算法对比演示 -->
+                <Border Width="280" Height="200" Margin="10"
+                        Background="#16213e" CornerRadius="10"
+                        BorderBrush="#28a745" BorderThickness="2">
+                    <Grid>
+                        <Button Style="{StaticResource CardButtonStyle}" Click="OpenNearestNeighborSearchDemo"/>
+                        <StackPanel Margin="20" VerticalAlignment="Center">
+                            <TextBlock Text="🔍" FontSize="48" HorizontalAlignment="Center" Margin="0 0 0 10"/>
+                            <TextBlock Text="最近邻搜索多算法对比" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center"/>
+                            <TextBlock Text="点击画布设置查询点" FontSize="12" Foreground="#a0a0a0" HorizontalAlignment="Center" Margin="0 5"/>
+                            <TextBlock Text="实时精度/性能对比" FontSize="11" Foreground="#808080" HorizontalAlignment="Center" Margin="0 5"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
             </WrapPanel>
         </ScrollViewer>
     </Grid>
