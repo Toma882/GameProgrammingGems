@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(.\\\\GPGems.DemoApp.exe)",
+      "Bash(cmd.exe /c \"cd /d d:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\GPGems.DemoApp\\\\bin\\\\Debug\\\\net9.0-windows && GPGems.DemoApp.exe\")",
+      "Read(//c/Users/Toma1/.claude/plans/**)",
+      "Bash(dotnet build *)",
+      "Bash(./GPGems.DemoApp.exe)",
+      "Bash(dir \"D:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\游戏编程精粹1_41个完整工程\\\\03 Artificial Intelligence\" /b)",
+      "Bash(dir \"D:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\游戏编程精粹2_SourceCode_12345章\\\\03 Artificial Intelligence\" /b)",
+      "Bash(dir \"D:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\游戏编程精粹1光盘源代码\\\\AI\" /b)",
+      "Bash(dir \"D:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\游戏编程精粹3光盘代码\\\\03 Artificial Intelligence\" /b)",
+      "Bash(awk '{print $NF}')",
+      "Bash(dir \"D:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\GameProgrammingGemsV游戏编程精粹5光盘代码\\\\第3章 人工智能\" /b)",
+      "Bash(dir \"D:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\游戏编程精粹7光盘代码\\\\3 AI\" /b)",
+      "Bash(dir \"D:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\游戏编程精粹1光盘源代码\\\\AI\\\\03Stout\" /b)",
+      "Bash(dir \"D:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\游戏编程精粹1光盘源代码\\\\AI\\\\02Svarovsky\" /b)",
+      "Bash(dir \"D:\\\\Project_Git@SVN\\\\GameProgrammingGems\\\\游戏编程精粹2_SourceCode_12345章\\\\03 Artificial Intelligence\\\\11 Woodcock\" /b)",
+      "Bash(Select-Object -Last 30)",
+      "Bash(taskkill /F /PID 3512)",
+      "Bash(Select-Object FullName)",
+      "Bash(git add *)",
+      "Bash(git rm *)",
+      "Bash(Select-Object -Last 10)",
+      "Bash(dotnet run *)",
+      "Bash(.\\\\GPGems.Benchmarks.exe --filter \"*AStarComparison*\")",
+      "Bash(Select-Object -First 80)",
+      "Bash(cd \"d:\\\\\\\\Project_Git@SVN\\\\\\\\GameProgrammingGems\\\\\\\\GPGems.Benchmarks\\\\\\\\bin\\\\\\\\Release\\\\\\\\net9.0\")",
+      "Bash(./GPGems.Benchmarks.exe --filter \"*AStarComparison*\")",
+      "Read(//d/Project_Git@SVN/ReadNote/游戏编程精粹/**)",
+      "Read(//d/Project_Git@SVN/ReadNote/游戏编程精粹/1/代码/**)",
+      "Bash(dotnet clean *)"
+    ]
+  }
+}
