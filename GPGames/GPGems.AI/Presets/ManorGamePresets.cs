@@ -5,6 +5,7 @@
  */
 
 using System;
+using GPGems.AI.Boids;
 
 namespace GPGems.AI.Presets
 {

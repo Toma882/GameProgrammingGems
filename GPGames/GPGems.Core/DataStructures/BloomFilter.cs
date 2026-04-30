@@ -11,9 +11,11 @@
  */
 
 using System;
+using System.Collections;
 using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
+using Math = global::System.Math;
 
 namespace GPGems.Core.DataStructures;
 
@@ -52,10 +54,10 @@ public class BloomFilter
             throw new ArgumentException("False positive rate must be between 0 and 1", nameof(falsePositiveRate));
 
         // 计算最佳位数: m = -n * ln(p) / (ln(2))^2
-        _size = (int)Math.Ceiling(-expectedItems * Math.Log(falsePositiveRate) / (Math.Log(2) * Math.Log(2)));
+        _size = (int)global::System.Math.Ceiling(-expectedItems * global::System.Math.Log(falsePositiveRate) / (global::System.Math.Log(2) * global::System.Math.Log(2)));
 
         // 计算最佳哈希函数数量: k = m/n * ln(2)
-        _hashCount = Math.Max(1, (int)Math.Round((double)_size / expectedItems * Math.Log(2)));
+        _hashCount = global::System.Math.Max(1, (int)global::System.Math.Round((double)_size / expectedItems * global::System.Math.Log(2)));
 
         _bits = new BitArray(_size, false);
         EstimatedCount = 0;
@@ -250,7 +252,7 @@ public class BloomFilter
     {
         // p = (1 - e^(-kn/m))^k
         double exponent = -_hashCount * EstimatedCount / (double)_size;
-        return Math.Pow(1 - Math.Exp(exponent), _hashCount);
+        return global::System.Math.Pow(1 - global::System.Math.Exp(exponent), _hashCount);
     }
 
     /// <summary>

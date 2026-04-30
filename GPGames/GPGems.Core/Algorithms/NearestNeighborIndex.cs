@@ -193,7 +193,7 @@ public class LocalitySensitiveHashing<T> : INearestNeighborIndex<T>
                 // 标准正态分布采样
                 double u1 = 1.0 - rand.NextDouble();
                 double u2 = 1.0 - rand.NextDouble();
-                double z = SysMath.Sqrt(-2.0 * SysMath.Log(u1)) * SysMath.Cos(2.0 * SysMath.PI * u2);
+                double z = global::System.Math.Sqrt(-2.0 * global::System.Math.Log(u1)) * global::System.Math.Cos(2.0 * global::System.Math.PI * u2);
                 RandomVector[i] = (float)z;
             }
         }
@@ -205,7 +205,7 @@ public class LocalitySensitiveHashing<T> : INearestNeighborIndex<T>
             {
                 dot += point[i] * RandomVector[i];
             }
-            return (long)SysMath.Floor(dot / bucketWidth);
+            return (long)global::System.Math.Floor(dot / bucketWidth);
         }
     }
 

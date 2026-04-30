@@ -17,7 +17,7 @@ namespace GPGems.MathPhysics.Spatial;
 
 /// <summary>
 /// 哈希网格 - 空间哈希索引
- * 将 2D 空间划分为格子，每个格子用哈希表存储元素
+// * 将 2D 空间划分为格子，每个格子用哈希表存储元素
 /// 适合极稀疏、元素频繁移动的场景
 /// </summary>
 /// <typeparam name="T">元素类型</typeparam>

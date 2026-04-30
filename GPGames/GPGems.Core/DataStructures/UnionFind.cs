@@ -244,25 +244,4 @@ namespace GPGems.Core.DataStructures
         #endregion
     }
 
-    /// <summary>
-    /// 带类型过滤的并查集（支持多种地块类型）
-    /// </summary>
-    public class TypedUnionFind
-    {
-        private readonly Dictionary<int, GridUnionFind> _typedSets = new();
-
-        public void Activate(int type, int x, int y)
-        {
-            if (!_typedSets.ContainsKey(type))
-                _typedSets[type] = new GridUnionFind(1000, 1000); // 默认大图
-            _typedSets[type].Activate(x, y);
-        }
-
-        public float GetYieldBonus(int type, int x, int y)
-        {
-            return _typedSets.TryGetValue(type, out var set)
-                ? set.GetYieldBonus(x, y)
-                : 1.0f;
-        }
-    }
 }

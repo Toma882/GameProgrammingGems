@@ -43,7 +43,7 @@ public enum SegmentTreeOp
 /// </summary>
 /// <typeparam name="T">数值类型</typeparam>
 public class SegmentTree<T>
-    where T : struct, INumber<T>
+    where T : struct, IBinaryInteger<T>
 {
     #region 字段
 
@@ -254,7 +254,7 @@ public class SegmentTree<T>
 /// 二维线段树 - 支持矩形区域查询
 /// </summary>
 public class SegmentTree2D<T>
-    where T : struct, INumber<T>
+    where T : struct, IBinaryInteger<T>
 {
     private readonly SegmentTree<T>[] _rows;
     private readonly int _width, _height;

@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace GPGems.AI.CollisionAvoidance;
 
 /// <summary>

@@ -296,10 +296,10 @@ public class SparseMatrix<T> : IEnumerable<(int x, int y, T value)>
         foreach (var key in _data.Keys)
         {
             var (x, y) = DecodeKey(key);
-            minX = Math.Min(minX, x);
-            minY = Math.Min(minY, y);
-            maxX = Math.Max(maxX, x);
-            maxY = Math.Max(maxY, y);
+            minX = global::System.Math.Min(minX, x);
+            minY = global::System.Math.Min(minY, y);
+            maxX = global::System.Math.Max(maxX, x);
+            maxY = global::System.Math.Max(maxY, y);
         }
 
         return (minX, minY, maxX, maxY);

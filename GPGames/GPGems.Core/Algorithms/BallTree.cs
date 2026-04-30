@@ -293,7 +293,7 @@ public class BallTree<T>
         return (
             1 + left.Item1 + right.Item1,
             left.Item2 + right.Item2,
-            SysMath.Max(left.Item3, right.Item3)
+            global::System.Math.Max(left.Item3, right.Item3)
         );
     }
 }

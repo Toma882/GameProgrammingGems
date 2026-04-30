@@ -700,7 +700,7 @@ public class RedBlackTree<TKey, TValue> : IEnumerable<(TKey key, TValue value)>
     {
         if (node == null)
             return 0;
-        return 1 + Math.Max(
+        return 1 + global::System.Math.Max(
             GetHeightRecursive(node.Left),
             GetHeightRecursive(node.Right));
     }

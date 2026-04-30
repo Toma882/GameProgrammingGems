@@ -69,7 +69,7 @@ public class StateMachineDefinition<TState, TEvent, TContext>
     }
 
     /// <summary>转换定义</summary>
-    private class Transition
+    internal class TransitionDefinition
     {
         public TState From { get; set; }
         public TState To { get; set; }

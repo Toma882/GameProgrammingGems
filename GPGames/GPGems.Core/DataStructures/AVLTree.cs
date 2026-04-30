@@ -13,6 +13,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Math = global::System.Math;
 
 namespace GPGems.Core.DataStructures;
 
@@ -96,7 +97,7 @@ public class AVLTree<TKey, TValue> : IEnumerable<(TKey key, TValue value)>
     /// </summary>
     private void UpdateHeight(AVLNode<TKey, TValue> node)
     {
-        node.Height = 1 + Math.Max(
+        node.Height = 1 + System.Math.Max(
             GetHeight(node.Left),
             GetHeight(node.Right));
     }
@@ -599,11 +600,11 @@ public class AVLTree<TKey, TValue> : IEnumerable<(TKey key, TValue value)>
             return -1;
 
         // 检查平衡因子
-        if (Math.Abs(leftHeight - rightHeight) > 1)
+        if (global::System.Math.Abs(leftHeight - rightHeight) > 1)
             return -1;
 
         // 检查高度值是否正确
-        int expectedHeight = 1 + Math.Max(leftHeight, rightHeight);
+        int expectedHeight = 1 + global::System.Math.Max(leftHeight, rightHeight);
         if (node.Height != expectedHeight)
             return -1;
 
