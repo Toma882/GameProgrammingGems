@@ -231,47 +231,6 @@ namespace GPGems.Core.DataStructures
         private long GenerateId() => _nextId++;
 
         #endregion
-
-        #region 经营游戏便捷API
-
-        /// <summary>
-        /// 添加作物成熟计时器
-        /// </summary>
-        public long AddCropRipen(float minutes, Action onRipen)
-        {
-            return AddTimer((long)(minutes * 60 * 1000), onRipen);
-        }
-
-        /// <summary>
-        /// 添加生产完成计时器
-        /// </summary>
-        public long AddProductionComplete(float seconds, Action onComplete)
-        {
-            return AddTimer((long)(seconds * 1000), onComplete);
-        }
-
-        /// <summary>
-        /// 添加顾客生成间隔
-        /// </summary>
-        public long AddCustomerSpawn(float intervalMs, Action onSpawn)
-        {
-            return AddPeriodic((long)intervalMs, onSpawn);
-        }
-
-        /// <summary>
-        /// 每日重置任务（固定时间点，如凌晨4点）
-        /// </summary>
-        public long AddDailyReset(int hour, int minute, Action onReset)
-        {
-            var now = DateTime.Now;
-            var next = new DateTime(now.Year, now.Month, now.Day, hour, minute, 0);
-            if (next <= now) next = next.AddDays(1);
-
-            long delayMs = (long)(next - now).TotalMilliseconds;
-            return AddPeriodic(24 * 3600 * 1000, onReset);
-        }
-
-        #endregion
     }
 
     #region 内部类型

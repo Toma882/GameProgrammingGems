@@ -164,7 +164,7 @@ namespace GPGems.Core.DataStructures
 
         #endregion
 
-        #region 经营游戏专用功能
+        #region 连通块统计
 
         /// <summary>
         /// 获取格子所在连通块的大小
@@ -174,22 +174,6 @@ namespace GPGems.Core.DataStructures
             if (!IsValid(x, y))
                 return 0;
             return _size[Find(x, y)];
-        }
-
-        /// <summary>
-        /// 获取产量加成（根据连块大小）
-        /// </summary>
-        public float GetYieldBonus(int x, int y)
-        {
-            int size = GetSize(x, y);
-
-            return size switch
-            {
-                >= 25 => 1.30f,   // 5x5 → +30%
-                >= 9 => 1.10f,    // 3x3 → +10%
-                >= 4 => 1.05f,    // 2x2 → +5%
-                _ => 1.0f
-            };
         }
 
         /// <summary>

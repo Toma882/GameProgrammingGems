@@ -204,51 +204,6 @@ namespace GPGems.MathPhysics.Spatial
         }
 
         #endregion
-
-        #region 经营游戏便捷API
-
-        /// <summary>
-        /// 添加美观度建筑（雕像/花园
-        /// </summary>
-        public void AddBeautyBuilding(int x, int y, float radius = 5f, float beauty = 0.2f)
-        {
-            AddSource(x, y, radius, beauty, FalloffType.Smoothstep);
-        }
-
-        /// <summary>
-        /// 添加噪音污染源（工厂/市场
-        /// </summary>
-        public void AddNoiseSource(int x, int y, float radius = 8f, float noise = -0.3f)
-        {
-            AddSource(x, y, radius, noise, FalloffType.Quadratic);
-        }
-
-        /// <summary>
-        /// 添加服务建筑（商店/医院
-        /// </summary>
-        public void AddServiceBuilding(int x, int y, float radius = 10f, float coverage = 1f)
-        {
-            AddSource(x, y, radius, coverage, FalloffType.Linear);
-        }
-
-        /// <summary>
-        /// 添加光环建筑（增益
-        /// </summary>
-        public void AddAuraBuilding(int x, int y, float radius = 6f, float bonus = 0.15f)
-        {
-            AddSource(x, y, radius, bonus, FalloffType.Constant);
-        }
-
-        /// <summary>
-        /// 获取地块最终满意度
-        /// </summary>
-        public float GetSatisfaction(int x, int y)
-        {
-            // 基础 0.5 + 影响值，范围 0-1
-            return Math.Clamp(0.5f + _field[x, y], 0f, 1f);
-        }
-
-        #endregion
     }
 
     #region 辅助类型
