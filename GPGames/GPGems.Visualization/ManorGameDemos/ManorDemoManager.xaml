@@ -1,0 +1,85 @@
+<UserControl x:Class="GPGems.Visualization.ManorGameDemos.ManorDemoManager"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="600" d:DesignWidth="900">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- 左侧控制面板 -->
+        <Border Grid.Column="0" Background="#F0F0F0" Padding="10">
+            <StackPanel>
+                <TextBlock Text="🏰 经营游戏算法演示" FontSize="14" FontWeight="Bold" Margin="0 0 0 15"/>
+
+                <!-- 演示选择 -->
+                <TextBlock Text="选择演示场景:" Margin="0 0 0 5"/>
+                <ComboBox x:Name="DemoSelector" SelectionChanged="DemoSelector_SelectionChanged" Margin="0 0 0 15">
+                    <ComboBoxItem Content="01 - 游客人流 (流场 + ORCA)"/>
+                    <ComboBoxItem Content="02 - 动物群体 (Boids)"/>
+                    <ComboBoxItem Content="03 - 员工任务 (A* + FSM)"/>
+                    <ComboBoxItem Content="04 - 紧急疏散 (社会力)"/>
+                </ComboBox>
+
+                <!-- 控制按钮 -->
+                <StackPanel Orientation="Horizontal" Margin="0 0 0 15">
+                    <Button x:Name="BtnPlayPause" Content="▶ 播放" Click="BtnPlayPause_Click" Width="80" Margin="0 0 5 0"/>
+                    <Button x:Name="BtnReset" Content="🔄 重置" Click="BtnReset_Click" Width="80"/>
+                </StackPanel>
+
+                <Separator Margin="0 0 0 10"/>
+
+                <!-- 参数调优区 -->
+                <TextBlock Text="⚙️ 参数调整" FontWeight="Bold" Margin="0 0 0 10"/>
+
+                <!-- 人数滑块 -->
+                <StackPanel Margin="0 0 0 10">
+                    <TextBlock Text="人数/动物数:" FontSize="11"/>
+                    <Slider x:Name="SliderCount" Minimum="10" Maximum="500" Value="100"
+                            IsSnapToTickEnabled="True" TickFrequency="10"/>
+                    <TextBlock Text="{Binding Value, ElementName=SliderCount, StringFormat={}当前: {0}}" FontSize="10"/>
+                </StackPanel>
+
+                <!-- 速度滑块 -->
+                <StackPanel Margin="0 0 0 10">
+                    <TextBlock Text="移动速度:" FontSize="11"/>
+                    <Slider x:Name="SliderSpeed" Minimum="0.1" Maximum="3" Value="1" Step="0.1"/>
+                    <TextBlock Text="{Binding Value, ElementName=SliderSpeed, StringFormat={}倍率: {0:F1}x}" FontSize="10"/>
+                </StackPanel>
+
+                <Separator Margin="0 10 0 10"/>
+
+                <!-- 实时统计 -->
+                <TextBlock Text="📊 实时统计" FontWeight="Bold" Margin="0 0 0 10"/>
+                <TextBlock x:Name="StatsFPS" Text="FPS: --" FontSize="11"/>
+                <TextBlock x:Name="StatsFrame" Text="帧数: 0" FontSize="11"/>
+                <TextBlock x:Name="StatsTime" Text="模拟时间: 0.0s" FontSize="11"/>
+                <TextBlock x:Name="StatsCollisions" Text="每帧碰撞: 0" FontSize="11" Margin="0 5 0 0"/>
+                <TextBlock x:Name="StatsThroughput" Text="吞吐量: 0/秒" FontSize="11"/>
+
+                <Separator Margin="0 10 0 10"/>
+
+                <!-- 场景说明 -->
+                <TextBlock x:Name="SceneDescription" TextWrapping="Wrap" FontSize="10" Foreground="#555">
+                    选择演示场景查看说明
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- 右侧渲染画布 -->
+        <Border Grid.Column="1" Background="White">
+            <Grid>
+                <Canvas x:Name="RenderCanvas" Background="#1A1A2E"/>
+                <!-- 小地图覆盖层 -->
+                <Border x:Name="MiniMapBorder" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Margin="10" Background="#AA000000" Width="150" Height="150" Visibility="Collapsed">
+                    <Canvas x:Name="MiniMapCanvas"/>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
