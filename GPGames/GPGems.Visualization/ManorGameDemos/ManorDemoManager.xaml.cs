@@ -7,6 +7,8 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Numerics;
 using GPGems.Core.Math;
+using GPGems.AI.ManorSimulation.Placement;
+
 namespace GPGems.Visualization.ManorGameDemos
 {
     public partial class ManorDemoManager : UserControl
@@ -22,11 +24,12 @@ namespace GPGems.Visualization.ManorGameDemos
         // 当前场景
         private IDemoScene _currentScene;
 
-        // 四个场景
+        // 场景
         private VisitorFlowScene _visitorScene;
         private AnimalGroupScene _animalScene;
         private EmployeeAIScene _employeeScene;
         private EvacuationScene _evacuationScene;
+        private PlacementScene _placementScene;
 
         // 渲染缓存
         private List<Shape> _renderCache = new List<Shape>();
@@ -53,10 +56,18 @@ namespace GPGems.Visualization.ManorGameDemos
             _animalScene = new AnimalGroupScene();
             _employeeScene = new EmployeeAIScene();
             _evacuationScene = new EvacuationScene();
+            _placementScene = new PlacementScene();
         }
 
         private void DemoSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // 先移除鼠标事件（避免重复注册）
+            RenderCanvas.MouseMove -= RenderCanvas_MouseMove;
+            RenderCanvas.MouseLeftButtonDown -= RenderCanvas_MouseLeftButtonDown;
+            RenderCanvas.MouseRightButtonDown -= RenderCanvas_MouseRightButtonDown;
+
+            PlacementPanel.Visibility = Visibility.Collapsed;
+
             switch (DemoSelector.SelectedIndex)
             {
                 case 0:
@@ -74,6 +85,16 @@ namespace GPGems.Visualization.ManorGameDemos
                 case 3:
                     _currentScene = _evacuationScene;
                     SceneDescription.Text = "演示：300人同时向唯一4米宽出口疏散。\n\n算法：社会力模型（人与人排斥、目标吸引、墙体排斥）";
+                    break;
+                case 4:
+                    _currentScene = _placementScene;
+                    PlacementPanel.Visibility = Visibility.Visible;
+                    SceneDescription.Text = "演示：位掩码多层地图的建筑物放置系统。\n\n数据结构：byte[,] 位图，每个格子1字节 = 8个图层\n\n操作：鼠标悬停预览，左键放置，右键删除";
+                    // 注册鼠标事件
+                    RenderCanvas.MouseMove += RenderCanvas_MouseMove;
+                    RenderCanvas.MouseLeftButtonDown += RenderCanvas_MouseLeftButtonDown;
+                    RenderCanvas.MouseRightButtonDown += RenderCanvas_MouseRightButtonDown;
+                    BuildingSelector.SelectedIndex = 0;
                     break;
             }
 
@@ -152,6 +173,81 @@ namespace GPGems.Visualization.ManorGameDemos
             // 渲染Agent
             _currentScene.RenderAgents(RenderCanvas, _renderCache);
         }
+
+        #region 放置场景事件
+
+        private void BuildingSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (BuildingSelector.SelectedItem is ComboBoxItem item && item.Tag is string tag)
+            {
+                int index = int.Parse(tag);
+                if (index >= 0 && index < _placementScene.BuildingPresets.Count)
+                {
+                    _placementScene.SelectedBuilding = _placementScene.BuildingPresets[index];
+                }
+            }
+            if (_currentScene == _placementScene)
+                Render();
+        }
+
+        private void BtnPlace_Click(object sender, RoutedEventArgs e)
+        {
+            _placementScene.PlaceCurrent();
+            // 更新统计
+            StatsCollisions.Text = $"已放置建筑: {_placementScene.GetStat("")}";
+            Render();
+        }
+
+        private void BtnClearAll_Click(object sender, RoutedEventArgs e)
+        {
+            _placementScene.Reset(0, 0);
+            StatsCollisions.Text = "已放置建筑: 0";
+            Render();
+        }
+
+        private void RenderCanvas_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            var pos = e.GetPosition(RenderCanvas);
+            var (gx, gy) = _placementScene.ScreenToGrid(pos.X, pos.Y);
+            _placementScene.PreviewX = gx;
+            _placementScene.PreviewY = gy;
+            Render();
+        }
+
+        private void RenderCanvas_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var pos = e.GetPosition(RenderCanvas);
+            var (gx, gy) = _placementScene.ScreenToGrid(pos.X, pos.Y);
+            _placementScene.PreviewX = gx;
+            _placementScene.PreviewY = gy;
+
+            int id = _placementScene.PlaceCurrent();
+            if (id > 0)
+            {
+                StatsCollisions.Text = $"已放置建筑: {_placementScene.GetStat("")}";
+            }
+            Render();
+        }
+
+        private void RenderCanvas_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var pos = e.GetPosition(RenderCanvas);
+            var (gx, gy) = _placementScene.ScreenToGrid(pos.X, pos.Y);
+
+            // 依次尝试删除各图层
+            bool removed = false;
+            removed |= _placementScene.RemoveAt(gx, gy, MapLayer.Building);
+            removed |= _placementScene.RemoveAt(gx, gy, MapLayer.Decoration);
+            removed |= _placementScene.RemoveAt(gx, gy, MapLayer.Path);
+
+            if (removed)
+            {
+                StatsCollisions.Text = $"已放置建筑: {_placementScene.GetStat("")}";
+            }
+            Render();
+        }
+
+        #endregion
     }
 
     // 场景接口

@@ -4,8 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using GPGems.AI.Pathfinding;
-using GPGems.AI.CollisionAvoidance;
+using GPGems.AI.ManorSimulation;
 using System.Numerics;
 using GPGems.Core.Math;
 
@@ -19,105 +18,43 @@ namespace GPGems.Visualization.ManorGameDemos
     /// </summary>
     public class VisitorFlowScene : IDemoScene
     {
+        private VisitorFlowSystem _visitorSystem = null!;
         private int _mapWidth = 100;
         private int _mapHeight = 50;
-        private GridMap _map;
-        private FlowFieldPathfinder _flowFieldA;
-        private FlowFieldPathfinder _flowFieldB;
-        private FlowFieldPathfinder _flowFieldExit;
-        private ORCASimulation _orca;
-        private Dictionary<int, int> _visitorState; // 0→A, 1→B, 2→出口
-        private int _collisions;
-        private int _arrivedTotal;
-        private Random _rand;
 
         public void Reset(int count, float speed)
         {
-            _map = CreateManorMap(_mapWidth, _mapHeight);
-            _flowFieldA = new FlowFieldPathfinder(_map);
-            _flowFieldB = new FlowFieldPathfinder(_map);
-            _flowFieldExit = new FlowFieldPathfinder(_map);
-            _flowFieldA.CalculateFlowField(50, 10);
-            _flowFieldB.CalculateFlowField(50, 40);
-            _flowFieldExit.CalculateFlowField(100, 25);
+            // 初始化算法门面
+            var facade = ManorAlgorithmFacade.Instance;
+            facade.Initialize(_mapWidth, _mapHeight);
 
-            _orca = new ORCASimulation();
-            _visitorState = new Dictionary<int, int>();
-            _rand = new Random(42);
-            _collisions = 0;
-            _arrivedTotal = 0;
-
-            // 生成游客
-            for (int i = 0; i < count; i++)
-            {
-                var visitor = _orca.AddAgent(
-                    new Vector2(_rand.Next(0, 5), _rand.Next(20, 30)),
-                    radius: 0.5f,
-                    maxSpeed: 1.8f * speed
-                );
-                visitor.PreferredVel = new Vector2(1, 0);
-                _visitorState[i] = _rand.Next(2); // 随机分配目的地
-            }
+            // 创建游客人流系统
+            _visitorSystem = facade.CreateVisitorFlowSystem(
+                visitorCount: count,
+                entranceX: 0,
+                entranceY: 23,
+                speedMultiplier: speed);
         }
 
         public void Update(float deltaTime)
         {
-            _collisions = 0;
-
-            for (int i = 0; i < _orca.Agents.Count; i++)
-            {
-                var agent = _orca.Agents[i];
-                int state = _visitorState[i];
-
-                Vector2 flowDir = Vector2.Zero;
-                switch (state)
-                {
-                    case 0: flowDir = _flowFieldA.GetDirection(agent.Position.X, agent.Position.Y); break;
-                    case 1: flowDir = _flowFieldB.GetDirection(agent.Position.X, agent.Position.Y); break;
-                    case 2: flowDir = _flowFieldExit.GetDirection(agent.Position.X, agent.Position.Y); break;
-                }
-
-                agent.PreferredVel = flowDir * agent.MaxSpeed;
-
-                // 检查到达
-                float distToA = Vector2.Distance(agent.Position, new Vector2(50, 10));
-                float distToB = Vector2.Distance(agent.Position, new Vector2(50, 40));
-                float distToExit = Vector2.Distance(agent.Position, new Vector2(100, 25));
-
-                if (state == 0 && distToA < 5f) { _visitorState[i] = 2; _arrivedTotal++; }
-                if (state == 1 && distToB < 5f) { _visitorState[i] = 2; _arrivedTotal++; }
-                if (state == 2 && distToExit < 5f)
-                {
-                    // 到达出口，回到入口重新开始（循环演示）
-                    agent.Position = new Vector2(_rand.Next(0, 5), _rand.Next(20, 30));
-                    _visitorState[i] = _rand.Next(2);
-                    _arrivedTotal++;
-                }
-            }
-
-            _orca.Update(deltaTime);
-
-            // 统计碰撞
-            for (int i = 0; i < _orca.Agents.Count; i++)
-                for (int j = i + 1; j < _orca.Agents.Count; j++)
-                    if (Vector2.Distance(_orca.Agents[i].Position, _orca.Agents[j].Position) < 0.9f)
-                        _collisions++;
+            _visitorSystem.Update(deltaTime);
         }
 
         public void RenderBackground(Canvas canvas, List<Shape> cache)
         {
-            float scale = 8f; // 每格8像素
+            float scale = 8f;
             canvas.Width = _mapWidth * scale;
             canvas.Height = _mapHeight * scale;
 
             // 道路/广场
             AddRect(canvas, cache, 0, 15, 15, 20, "#6B8E23", scale);    // 入口广场
-            AddRect(canvas, cache, 0, 23, 100, 4, "#DAA520", scale);     // 主路
-            AddRect(canvas, cache, 20, 8, 35, 4, "#DAA520", scale); // 到A的路
-            AddRect(canvas, cache, 20, 38, 35, 4, "#DAA520", scale); // 到B的路
-            AddRect(canvas, cache, 45, 5, 10, 10, "#8FBC8F", scale);  // 景点A广场
-            AddRect(canvas, cache, 45, 35, 10, 10, "#8FBC8F", scale);  // 景点B广场
-            AddRect(canvas, cache, 90, 20, 10, 10, "#CD853F", scale); // 出口广场
+            AddRect(canvas, cache, 0, 23, 100, 4, "#DAA520", scale);    // 主路
+            AddRect(canvas, cache, 20, 8, 35, 4, "#DAA520", scale);     // 到A的路
+            AddRect(canvas, cache, 20, 38, 35, 4, "#DAA520", scale);    // 到B的路
+            AddRect(canvas, cache, 45, 5, 10, 10, "#8FBC8F", scale);    // 景点A广场
+            AddRect(canvas, cache, 45, 35, 10, 10, "#8FBC8F", scale);    // 景点B广场
+            AddRect(canvas, cache, 90, 20, 10, 10, "#CD853F", scale);   // 出口广场
 
             // 景点建筑
             AddRect(canvas, cache, 47, 7, 6, 6, "#8B4513", scale);
@@ -134,10 +71,12 @@ namespace GPGems.Visualization.ManorGameDemos
         {
             float scale = 8f;
 
-            for (int i = 0; i < _orca.Agents.Count; i++)
+            for (int i = 0; i < _visitorSystem.AgentCount; i++)
             {
-                var agent = _orca.Agents[i];
-                var color = _visitorState[i] switch
+                var agent = _visitorSystem.GetAgent(i);
+                var state = _visitorSystem.GetVisitorState(i);
+
+                var color = state switch
                 {
                     0 => "#FF6B6B",  // 去A - 红
                     1 => "#4ECDC4",  // 去B - 青
@@ -153,25 +92,20 @@ namespace GPGems.Visualization.ManorGameDemos
         {
             return name switch
             {
-                "collision" => _collisions,
-                "throughput" => _arrivedTotal,
+                "collision" => _visitorSystem.CollisionCount,
+                "throughput" => _visitorSystem.ArrivedCount,
                 _ => 0
             };
         }
 
-        #region 辅助
-        private GridMap CreateManorMap(int width, int height)
-        {
-            var map = new GridMap(width, height);
-            // 默认全可走（简化版
-            return map;
-        }
-
+        #region 渲染辅助
         private void AddRect(Canvas c, List<Shape> cache, float x, float y, float w, float h, string color, float scale)
         {
             var rect = new Rectangle
             {
-                Width = w * scale, Height = h * scale, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color))
+                Width = w * scale,
+                Height = h * scale,
+                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color))
             };
             Canvas.SetLeft(rect, x * scale);
             Canvas.SetTop(rect, y * scale);
@@ -205,7 +139,6 @@ namespace GPGems.Visualization.ManorGameDemos
             Canvas.SetLeft(tb, x * scale);
             Canvas.SetTop(tb, y * scale);
             c.Children.Add(tb);
-            //  cache.Add(tb);
         }
         #endregion
     }

@@ -4,9 +4,13 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using GPGems.AI.ManorSimulation;
 using GPGems.AI.Pathfinding;
 using System.Numerics;
 using GPGems.Core.Math;
+
+using Rectangle = System.Windows.Shapes.Rectangle;
+
 namespace GPGems.Visualization.ManorGameDemos
 {
     /// <summary>
@@ -15,85 +19,52 @@ namespace GPGems.Visualization.ManorGameDemos
     /// </summary>
     public class EmployeeAIScene : IDemoScene
     {
-        private GridMap _map;
-        private AStarPathfinder _aStar;
-        private List<Employee> _employees;
-        private List<Task> _tasks;
-        private Random _rand;
-        private int _tasksCompleted;
-        private float _time;
+        private EmployeeTaskSystem _taskSystem = null!;
+        private GridMap _map = null!;
+        private List<TaskDisplay> _taskDisplays = new();
+        private string[] _employeeColors = { "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7" };
 
         public void Reset(int count, float speed)
         {
-            _map = CreateFarmMap(50, 50);
-            _aStar = new AStarPathfinder();
-            _rand = new Random(42);
-            _tasksCompleted = 0;
-            _time = 0;
+            // 初始化地图
+            int mapSize = 50;
+            _map = CreateFarmMap(mapSize, mapSize);
 
-            // 5个员工
-            _employees = new List<Employee>();
-            for (int i = 0; i < Math.Min(count, 10); i++)
-            {
-                _employees.Add(new Employee
-                {
-                    Id = i,
-                    Position = new Vector2(25, 25),
-                    State = EmployeeState.Idle,
-                    Color = _employeeColors[i % _employeeColors.Length]
-                });
-            }
+            // 初始化算法门面
+            var facade = ManorAlgorithmFacade.Instance;
+            facade.Initialize(mapSize, mapSize);
 
-            // count个任务
-            _tasks = new List<Task>();
+            // 创建员工任务系统
+            _taskSystem = facade.CreateEmployeeTaskSystem(
+                employeeCount: Math.Min(count, 10),
+                mapWidth: mapSize,
+                mapHeight: mapSize);
+
+            // 添加任务
             var types = new[] { "Harvest", "Feed", "Serve" };
+            var rand = new Random(42);
+            _taskDisplays.Clear();
+
             for (int i = 0; i < count; i++)
             {
-                _tasks.Add(new Task
+                var taskType = types[rand.Next(3)];
+                var pos = new Vector2(rand.Next(5, 45), rand.Next(5, 45));
+                var duration = 1f + (float)rand.NextDouble() * 2f;
+
+                _taskSystem.AddTask(taskType, pos, duration);
+
+                _taskDisplays.Add(new TaskDisplay
                 {
-                    Id = i,
-                    Type = types[_rand.Next(3)],
-                    Position = new Vector2(_rand.Next(5, 45), _rand.Next(5, 45)),
-                    Duration = 1f + (float)_rand.NextDouble() * 2f
+                    Type = taskType,
+                    Position = pos,
+                    Duration = duration
                 });
             }
         }
 
         public void Update(float deltaTime)
         {
-            _time += deltaTime;
-
-            foreach (var emp in _employees)
-            {
-                // 空闲员工分配任务
-                if (emp.State == EmployeeState.Idle)
-                {
-                    var available = _tasks.Where(t => !t.Completed && !t.Assigned).ToList();
-                    if (available.Any())
-                    {
-                        // 就近分配
-                        var nearest = available.OrderBy(t => Distance(emp.Position, t.Position)).First();
-
-                        var start = _map.GetNode((int)emp.Position.X, (int)emp.Position.Y);
-                        var goal = _map.GetNode((int)nearest.Position.X, (int)nearest.Position.Y);
-                        var path = _aStar.FindPath(_map, start, goal);
-
-                        if (path.Count > 0)
-                        {
-                            emp.AssignTask(nearest, path);
-                            nearest.Assigned = true;
-                        }
-                    }
-                }
-
-                emp.Update(deltaTime * 2f);
-
-                if (emp.State == EmployeeState.TaskComplete)
-                {
-                    _tasksCompleted++;
-                    emp.State = EmployeeState.Idle;
-                }
-            }
+            _taskSystem.Update(deltaTime * 2f);
         }
 
         public void RenderBackground(Canvas canvas, List<Shape> cache)
@@ -112,13 +83,13 @@ namespace GPGems.Visualization.ManorGameDemos
             AddRect(canvas, cache, 23, 23, 4, 4, "#8B0000", scale);
 
             // 任务点
-            foreach (var task in _tasks.Where(t => !t.Completed))
+            foreach (var task in _taskDisplays.Where(t => !t.Completed))
             {
                 var color = task.Type switch
                 {
-                    "Harvest" => "#32CD32",  // 收菜
-                    "Feed" => "#DAA520",     // 喂食
-                    "Serve" => "#1E90FF",    // 服务
+                    "Harvest" => "#32CD32",
+                    "Feed" => "#DAA520",
+                    "Serve" => "#1E90FF",
                     _ => "#888"
                 };
                 AddRect(canvas, cache, task.Position.X - 0.4f, task.Position.Y - 0.4f, 0.8f, 0.8f, color, scale);
@@ -130,26 +101,30 @@ namespace GPGems.Visualization.ManorGameDemos
             float scale = 12f;
 
             // 员工
-            foreach (var emp in _employees)
+            for (int i = 0; i < _taskSystem.Employees.Count; i++)
             {
-                var color = emp.State switch
+                var emp = _taskSystem.Employees[i];
+                var state = _taskSystem.GetEmployeeState(i);
+                var colorStr = state switch
                 {
                     EmployeeState.Idle => "#808080",
                     EmployeeState.Moving => "#FFD700",
                     EmployeeState.Working => "#00FF00",
+                    EmployeeState.Resting => "#FFA500",
                     _ => "#FF0000"
                 };
 
-                AddCircle(canvas, cache, emp.Position.X, emp.Position.Y, 0.5f, color, scale);
+                AddCircle(canvas, cache, emp.Position.X, emp.Position.Y, 0.5f, colorStr, scale);
 
                 // 显示当前路径
-                if (emp.CurrentPath != null && emp.State == EmployeeState.Moving)
+                if (emp.CurrentPath.Count > 0 && state == EmployeeState.Moving)
                 {
-                    for (int i = emp.PathIndex; i < emp.CurrentPath.Count - 1; i++)
+                    var empColor = _employeeColors[i % _employeeColors.Length];
+                    for (int j = emp.PathIndex; j < emp.CurrentPath.Count - 1; j++)
                     {
-                        var n1 = emp.CurrentPath[i];
-                        var n2 = emp.CurrentPath[i + 1];
-                        AddLine(canvas, cache, n1.X + 0.5f, n1.Y + 0.5f, n2.X + 0.5f, n2.Y + 0.5f, emp.Color, 1, scale);
+                        var n1 = emp.CurrentPath[j];
+                        var n2 = emp.CurrentPath[j + 1];
+                        AddLine(canvas, cache, n1.X + 0.5f, n1.Y + 0.5f, n2.X + 0.5f, n2.Y + 0.5f, empColor, 1, scale);
                     }
                 }
             }
@@ -160,73 +135,20 @@ namespace GPGems.Visualization.ManorGameDemos
             return name switch
             {
                 "collision" => 0,
-                "throughput" => _tasksCompleted,
+                "throughput" => _taskSystem.CompletedTasks,
                 _ => 0
             };
         }
 
-        #region 辅助
-        enum EmployeeState { Idle, Moving, Working, TaskComplete }
+        #region 辅助类与渲染
 
-        class Employee
+        private class TaskDisplay
         {
-            public int Id;
-            public Vector2 Position;
-            public EmployeeState State;
-            public Task CurrentTask;
-            public List<GridNode> CurrentPath;
-            public int PathIndex;
-            public float WorkProgress;
-            public string Color;
-
-            public void AssignTask(Task task, List<GridNode> path)
-            {
-                CurrentTask = task;
-                CurrentPath = path;
-                PathIndex = 0;
-                State = EmployeeState.Moving;
-                WorkProgress = 0;
-            }
-
-            public void Update(float deltaTime)
-            {
-                if (State == EmployeeState.Moving && CurrentPath != null)
-                {
-                    // 每帧走一格
-                    if (PathIndex < CurrentPath.Count)
-                    {
-                        var node = CurrentPath[PathIndex];
-                        Position = new Vector2(node.X, node.Y);
-                        PathIndex++;
-                    }
-                    else
-                    {
-                        State = EmployeeState.Working;
-                    }
-                }
-                else if (State == EmployeeState.Working)
-                {
-                    WorkProgress += deltaTime;
-                    if (WorkProgress >= CurrentTask.Duration)
-                    {
-                        CurrentTask.Completed = true;
-                        State = EmployeeState.TaskComplete;
-                    }
-                }
-            }
+            public string Type { get; set; } = string.Empty;
+            public Vector2 Position { get; set; }
+            public float Duration { get; set; }
+            public bool Completed { get; set; }
         }
-
-        class Task
-        {
-            public int Id;
-            public string Type;
-            public Vector2 Position;
-            public float Duration;
-            public bool Assigned;
-            public bool Completed;
-        }
-
-        private string[] _employeeColors = { "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7" };
 
         private GridMap CreateFarmMap(int width, int height)
         {
@@ -240,16 +162,14 @@ namespace GPGems.Visualization.ManorGameDemos
             return map;
         }
 
-        private float Distance(Vector2 a, Vector2 b)
-        {
-            float dx = a.X - b.X;
-            float dy = a.Y - b.Y;
-            return (float)Math.Sqrt(dx * dx + dy * dy);
-        }
-
         private void AddRect(Canvas c, List<Shape> cache, float x, float y, float w, float h, string color, float scale)
         {
-            var rect = new Rectangle { Width = w * scale, Height = h * scale, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)) };
+            var rect = new Rectangle
+            {
+                Width = w * scale,
+                Height = h * scale,
+                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color))
+            };
             Canvas.SetLeft(rect, x * scale);
             Canvas.SetTop(rect, y * scale);
             c.Children.Add(rect);
@@ -258,7 +178,12 @@ namespace GPGems.Visualization.ManorGameDemos
 
         private void AddCircle(Canvas c, List<Shape> cache, float x, float y, float r, string color, float scale)
         {
-            var circle = new Ellipse { Width = r * 2 * scale, Height = r * 2 * scale, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)) };
+            var circle = new Ellipse
+            {
+                Width = r * 2 * scale,
+                Height = r * 2 * scale,
+                Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color))
+            };
             Canvas.SetLeft(circle, (x - r) * scale);
             Canvas.SetTop(circle, y * scale);
             c.Children.Add(circle);
@@ -277,6 +202,7 @@ namespace GPGems.Visualization.ManorGameDemos
             c.Children.Add(line);
             cache.Add(line);
         }
+
         #endregion
     }
 }

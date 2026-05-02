@@ -18,6 +18,20 @@ public partial class LauncherWindow : Window
         new BoidsDemoWindow().Show();
     }
 
+    /// <summary>打开庄园模拟演示</summary>
+    private void OpenManorDemo(object sender, RoutedEventArgs e)
+    {
+        var window = new Window
+        {
+            Title = "🏰 庄园模拟演示",
+            Width = 1200,
+            Height = 800,
+            WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            Content = new GPGems.Visualization.ManorGameDemos.ManorDemoManager()
+        };
+        window.Show();
+    }
+
     /// <summary>打开博弈树搜索演示</summary>
     private void OpenGameTreeDemo(object sender, RoutedEventArgs e)
     {
