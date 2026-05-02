@@ -1,3 +1,4 @@
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.Core.Geometry;
@@ -72,7 +73,7 @@ public class Polygon
     {
         if (_vertices.Count >= 3)
         {
-            Plane = Plane.FromPoints(
+            Plane = VectorExtensions.CreateFromPoints(
                 _vertices[0].Position,
                 _vertices[1].Position,
                 _vertices[2].Position

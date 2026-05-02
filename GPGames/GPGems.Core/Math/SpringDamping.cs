@@ -1,3 +1,4 @@
+using System.Numerics;
 namespace GPGems.Core.Math;
 
 /// <summary>
@@ -52,7 +53,7 @@ public static class SpringDamping
         Vector3 targetEuler = ToEuler(target);
 
         Vector3 smoothed = SmoothDamp(currentEuler, targetEuler, ref angularVelocity, deltaTime, smoothTime);
-        return Quaternion.FromEuler(smoothed.X, smoothed.Y, smoothed.Z);
+        return VectorExtensions.CreateFromEuler(smoothed.X, smoothed.Y, smoothed.Z);
     }
 
     private static Vector3 ToEuler(Quaternion q)

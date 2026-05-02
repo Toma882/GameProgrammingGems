@@ -5,6 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using GPGems.Core.Graphics;
+using System.Numerics;
 using GPGems.Core.Math;
 using GPGems.Graphics.SpatialPartitioning;
 using Polygon = GPGems.Core.Geometry.Polygon;

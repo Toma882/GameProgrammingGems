@@ -1,3 +1,4 @@
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.Core.Geometry;
@@ -7,6 +8,7 @@ namespace GPGems.Core.Geometry;
 /// 用于 UI 碰撞、2D 游戏物理等
 /// </summary>
 public static class Intersection2D
+
 {
     /// <summary>点是否在矩形内</summary>
     public static bool PointInRect(Vector2 point, Vector2 min, Vector2 max)
@@ -51,7 +53,7 @@ public static class Intersection2D
         for (int i = 0; i < polygon.Length; i++)
         {
             int j = (i + 1) % polygon.Length;
-            float cross = Vector2.Cross(polygon[j] - polygon[i], point - polygon[i]);
+            float cross = VectorExtensions.Cross(polygon[j] - polygon[i], point - polygon[i]);
 
             if (MathF.Abs(cross) < 1e-6f)
                 continue;
@@ -120,7 +122,7 @@ public static class Intersection2D
 
     private static float Direction(Vector2 p1, Vector2 p2, Vector2 p3)
     {
-        return Vector2.Cross(p3 - p1, p2 - p1);
+        return VectorExtensions.Cross(p3 - p1, p2 - p1);
     }
 
     private static bool OnSegment(Vector2 p0, Vector2 p1, Vector2 p)

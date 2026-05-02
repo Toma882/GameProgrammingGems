@@ -2,10 +2,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Numerics;
 using GPGems.Core.Math;
 using GPGems.Core.Geometry;
 using GPGems.Core.Physics.Collision;
-using Vec2 = GPGems.Core.Math.Vector2;
+using Vec2 = System.Numerics.Vector2;
 using Polygon = System.Windows.Shapes.Polygon;
 
 namespace GPGems.DemoApp.Physics;

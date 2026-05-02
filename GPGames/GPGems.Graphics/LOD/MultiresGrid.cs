@@ -1,3 +1,4 @@
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.Graphics.LOD;

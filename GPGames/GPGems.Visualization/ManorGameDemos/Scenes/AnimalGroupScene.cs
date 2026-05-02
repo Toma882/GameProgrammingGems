@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using GPGems.AI.Boids;
+using GPGems.AI.ManorSimulation;
+using System.Numerics;
+using GPGems.Core.Math;
 
 namespace GPGems.Visualization.ManorGameDemos
 {
@@ -73,15 +77,12 @@ namespace GPGems.Visualization.ManorGameDemos
             _fishFlock.Update(_fishSettings, _bounds);
 
             // 放牧：无目标，漫游
-            _grazingSettings.WanderWeight = 2f;
-            _grazingSettings.SeekTargetWeight = 0;
-            _grazingFlock.Update(_grazingSettings, _bounds);
+            var grazingSettings = _grazingSettings with { WanderWeight = 2f, SeekTargetWeight = 0 };
+            _grazingFlock.Update(grazingSettings, _bounds);
 
             // 蝴蝶：完全随机漫游
-            _butterflySettings.WanderWeight = 3f;
-            _butterflySettings.AlignmentWeight = 0.2f;
-            _butterflySettings.CohesionWeight = 0.3f;
-            _butterflyFlock.Update(_butterflySettings, _bounds);
+            var butterflySettings = _butterflySettings with { WanderWeight = 3f, AlignmentWeight = 0.2f, CohesionWeight = 0.3f };
+            _butterflyFlock.Update(butterflySettings, _bounds);
         }
 
         public void RenderBackground(Canvas canvas, List<Shape> cache)
@@ -94,14 +95,14 @@ namespace GPGems.Visualization.ManorGameDemos
             AddRect(canvas, cache, 2, 2, 30, 25, "#1E90FF", scale);
 
             // 草地
-            AddRect(canvas, cache, 37, 2, 30, 25, "#90EE90, scale);
+            AddRect(canvas, cache, 37, 2, 30, 25, "#90EE90", scale);
 
             // 花园
             AddRect(canvas, cache, 12, 32, 45, 15, "#FFB6C1", scale);
 
             // 分隔线
-            AddLine(canvas, cache, 35, 0, 35, 50, "#555, 1, scale);
-            AddLine(canvas, cache, 0, 30, 70, 30, "#555, 1, scale);
+            AddLine(canvas, cache, 35, 0, 35, 50, "#555", 1, scale);
+            AddLine(canvas, cache, 0, 30, 70, 30, "#555", 1, scale);
 
             // 标注
             AddText(canvas, cache, "🐟 鱼群", 13, 13, scale, Brushes.White);

@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Numerics;
+using GPGems.Core.Math;
 
 namespace GPGems.Visualization.ManorGameDemos
 {
@@ -81,20 +84,20 @@ namespace GPGems.Visualization.ManorGameDemos
             canvas.Height = 85 * scale;
 
             // 广场
-            AddRect(canvas, cache, 0, 0, 85, 80, "#E8E8E8, scale);
+            AddRect(canvas, cache, 0, 0, 85, 80, "#E8E8E8", scale);
 
             // 围墙
             foreach (var wall in _sim.Walls)
             {
-                AddLine(canvas, cache, wall.Start.X, wall.Start.Y, wall.End.X, wall.End.Y, "#333, 3, scale);
+                AddLine(canvas, cache, wall.Start.X, wall.Start.Y, wall.End.X, wall.End.Y, "#333", 3, scale);
             }
 
             // 出口高亮
-            AddRect(canvas, cache, 85, 38, 3, 9, "#32CD32, scale);
+            AddRect(canvas, cache, 85, 38, 3, 9, "#32CD32", scale);
             AddText(canvas, cache, "出口 →", 80, 42, scale, Brushes.Green);
 
             // 安全区域
-            AddRect(canvas, cache, 88, 0, 12, 80, "#90EE90, scale);
+            AddRect(canvas, cache, 88, 0, 12, 80, "#90EE90", scale);
         }
 
         public void RenderAgents(Canvas canvas, List<Shape> cache)

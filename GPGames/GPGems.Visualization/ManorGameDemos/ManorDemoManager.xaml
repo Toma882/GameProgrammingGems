@@ -47,7 +47,8 @@
                 <!-- 速度滑块 -->
                 <StackPanel Margin="0 0 0 10">
                     <TextBlock Text="移动速度:" FontSize="11"/>
-                    <Slider x:Name="SliderSpeed" Minimum="0.1" Maximum="3" Value="1" Step="0.1"/>
+                    <Slider x:Name="SliderSpeed" Minimum="0.1" Maximum="3" Value="1"
+                            IsSnapToTickEnabled="True" TickFrequency="0.1"/>
                     <TextBlock Text="{Binding Value, ElementName=SliderSpeed, StringFormat={}倍率: {0:F1}x}" FontSize="10"/>
                 </StackPanel>
 

@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using GPGems.AI.Steering;
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.Visualization.Steering;

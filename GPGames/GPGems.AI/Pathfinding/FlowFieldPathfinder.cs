@@ -1,3 +1,6 @@
+using System.Numerics;
+using GPGems.Core.Math;
+
 namespace GPGems.AI.Pathfinding;
 
 /// <summary>
@@ -212,34 +215,4 @@ public class FlowFieldPathfinder
             }
         }
     }
-}
-
-/// <summary>
-/// 简单的2D向量结构（与System.Numerics兼容但更轻量）
-/// </summary>
-public struct Vector2
-{
-    public float X, Y;
-
-    public Vector2(float x, float y) { X = x; Y = y; }
-
-    public static Vector2 Zero => new Vector2(0, 0);
-    public float Length => (float)Math.Sqrt(X * X + Y * Y);
-
-    public Vector2 Normalized()
-    {
-        float len = Length;
-        return len > 0 ? new Vector2(X / len, Y / len) : Zero;
-    }
-
-    public static float Distance(Vector2 a, Vector2 b)
-    {
-        float dx = a.X - b.X;
-        float dy = a.Y - b.Y;
-        return (float)Math.Sqrt(dx * dx + dy * dy);
-    }
-
-    public static Vector2 operator +(Vector2 a, Vector2 b) => new Vector2(a.X + b.X, a.Y + b.Y);
-    public static Vector2 operator -(Vector2 a, Vector2 b) => new Vector2(a.X - b.X, a.Y - b.Y);
-    public static Vector2 operator *(Vector2 a, float s) => new Vector2(a.X * s, a.Y * s);
 }

@@ -11,7 +11,7 @@
  */
 
 using System;
-using System.Numerics;
+using SysBitOps = System.Numerics.BitOperations;
 
 namespace GPGems.Core.DataStructures;
 
@@ -574,7 +574,7 @@ public class BitMap2D
 
         int count = 0;
         for (int i = 0; i < _data.Length; i++)
-            count += BitOperations.PopCount(_data[i]);
+            count += SysBitOps.PopCount(_data[i]);
 
         _cachedCount = count;
         return count;
@@ -588,7 +588,7 @@ public class BitMap2D
         int count = 0;
         int rowBase = y * _ulongsPerRow;
         for (int i = 0; i < _ulongsPerRow; i++)
-            count += BitOperations.PopCount(_data[rowBase + i]);
+            count += SysBitOps.PopCount(_data[rowBase + i]);
         return count;
     }
 

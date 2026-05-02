@@ -5,7 +5,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Threading;
-
+using System.Numerics;
+using GPGems.Core.Math;
 namespace GPGems.Visualization.ManorGameDemos
 {
     public partial class ManorDemoManager : UserControl
@@ -98,7 +99,7 @@ namespace GPGems.Visualization.ManorGameDemos
         private void ResetCurrentScene()
         {
             _frame = 0;
-            _currentScene?.Reset((int)SliderCount.Value, SliderSpeed.Value);
+            _currentScene?.Reset((int)SliderCount.Value, (float)SliderSpeed.Value);
             Render();
         }
 

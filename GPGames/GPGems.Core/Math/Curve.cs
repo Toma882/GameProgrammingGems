@@ -1,3 +1,4 @@
+using System.Numerics;
 namespace GPGems.Core.Math;
 
 /// <summary>

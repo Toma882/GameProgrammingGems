@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 using System.Windows.Shapes;
 using GPGems.AI.Boids;
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.Visualization.Boids;

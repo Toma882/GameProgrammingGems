@@ -6,6 +6,10 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using GPGems.AI.Pathfinding;
 using GPGems.AI.CollisionAvoidance;
+using System.Numerics;
+using GPGems.Core.Math;
+
+using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace GPGems.Visualization.ManorGameDemos
 {
@@ -107,8 +111,8 @@ namespace GPGems.Visualization.ManorGameDemos
             canvas.Height = _mapHeight * scale;
 
             // 道路/广场
-            AddRect(canvas, cache, 0, 15, 15, 20, "#6B8E23, scale);    // 入口广场
-            AddRect(canvas, cache, 0, 23, 100, 4, "#DAA520, scale);     // 主路
+            AddRect(canvas, cache, 0, 15, 15, 20, "#6B8E23", scale);    // 入口广场
+            AddRect(canvas, cache, 0, 23, 100, 4, "#DAA520", scale);     // 主路
             AddRect(canvas, cache, 20, 8, 35, 4, "#DAA520", scale); // 到A的路
             AddRect(canvas, cache, 20, 38, 35, 4, "#DAA520", scale); // 到B的路
             AddRect(canvas, cache, 45, 5, 10, 10, "#8FBC8F", scale);  // 景点A广场
@@ -135,10 +139,10 @@ namespace GPGems.Visualization.ManorGameDemos
                 var agent = _orca.Agents[i];
                 var color = _visitorState[i] switch
                 {
-                    0 => "#FF6B6B,  // 去A - 红
+                    0 => "#FF6B6B",  // 去A - 红
                     1 => "#4ECDC4",  // 去B - 青
                     2 => "#FFE66D",  // 去出口 - 黄
-                    _ => "#888888
+                    _ => "#888888"
                 };
 
                 AddCircle(canvas, cache, agent.Position.X, agent.Position.Y, 0.4f, color, scale);
@@ -167,7 +171,7 @@ namespace GPGems.Visualization.ManorGameDemos
         {
             var rect = new Rectangle
             {
-                Width = w * scale, Height = h * scale, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color)
+                Width = w * scale, Height = h * scale, Fill = new SolidColorBrush((Color)ColorConverter.ConvertFromString(color))
             };
             Canvas.SetLeft(rect, x * scale);
             Canvas.SetTop(rect, y * scale);

@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using GPGems.AI.Steering;
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.DemoApp;

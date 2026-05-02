@@ -12,6 +12,7 @@ using System.Diagnostics;
 using GPGems.AI.Pathfinding;
 using GPGems.AI.Boids;
 using GPGems.AI.CollisionAvoidance;
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.TestConsole

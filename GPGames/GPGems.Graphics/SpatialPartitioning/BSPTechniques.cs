@@ -1,4 +1,5 @@
 using GPGems.Core.Graphics;
+using System.Numerics;
 using GPGems.Core.Math;
 using GPGems.Core.Geometry;
 

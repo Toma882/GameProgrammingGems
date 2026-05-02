@@ -1,4 +1,5 @@
 using GPGems.Core.Graphics;
+using System.Numerics;
 using GPGems.Core.Math;
 using GPGems.Core.Geometry;
 
@@ -306,7 +307,7 @@ public class ABT
             _ => new Vector3(bounds.Center.X, bounds.Center.Y, position)
         };
 
-        return new Plane(normal, point);
+        return new Plane(normal, -Vector3.Dot(normal, point));
     }
 
     /// <summary>获取向量在指定轴上的值</summary>

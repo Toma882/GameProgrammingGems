@@ -11,6 +11,7 @@
 
 using System;
 using System.Collections.Generic;
+using GPGems.Core.DataStructures;
 
 namespace GPGems.Manor;
 

@@ -4,9 +4,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Numerics;
 using GPGems.Core.Math;
-using Vec2 = GPGems.Core.Math.Vector2;
-using Vec3 = GPGems.Core.Math.Vector3;
+using Vec2 = System.Numerics.Vector2;
+using Vec3 = System.Numerics.Vector3;
 
 namespace GPGems.DemoApp.Math;
 

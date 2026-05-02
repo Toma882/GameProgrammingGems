@@ -18,7 +18,8 @@ using GPGems.AI.Pathfinding;
 using GPGems.AI.CollisionAvoidance;
 using GPGems.AI.Boids;
 using GPGems.AI.Presets;
-
+using System.Numerics;
+using GPGems.Core.Math;
 namespace GPGems.AI.ManorSimulation
 {
     /// <summary>

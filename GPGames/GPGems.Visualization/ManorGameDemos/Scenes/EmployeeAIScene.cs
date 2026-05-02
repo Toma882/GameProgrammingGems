@@ -5,7 +5,8 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using GPGems.AI.Pathfinding;
-
+using System.Numerics;
+using GPGems.Core.Math;
 namespace GPGems.Visualization.ManorGameDemos
 {
     /// <summary>
@@ -105,7 +106,7 @@ namespace GPGems.Visualization.ManorGameDemos
             for (int x = 0; x < 50; x++)
                 for (int y = 0; y < 50; y++)
                     if (!_map.GetNode(x, y).IsWalkable)
-                        AddRect(canvas, cache, x, y, 1, 1, "#2E2E2E, scale);
+                        AddRect(canvas, cache, x, y, 1, 1, "#2E2E2E", scale);
 
             // 员工宿舍
             AddRect(canvas, cache, 23, 23, 4, 4, "#8B0000", scale);
@@ -118,7 +119,7 @@ namespace GPGems.Visualization.ManorGameDemos
                     "Harvest" => "#32CD32",  // 收菜
                     "Feed" => "#DAA520",     // 喂食
                     "Serve" => "#1E90FF",    // 服务
-                    _ => "#888
+                    _ => "#888"
                 };
                 AddRect(canvas, cache, task.Position.X - 0.4f, task.Position.Y - 0.4f, 0.8f, 0.8f, color, scale);
             }
@@ -136,7 +137,7 @@ namespace GPGems.Visualization.ManorGameDemos
                     EmployeeState.Idle => "#808080",
                     EmployeeState.Moving => "#FFD700",
                     EmployeeState.Working => "#00FF00",
-                    _ => "#FF0000
+                    _ => "#FF0000"
                 };
 
                 AddCircle(canvas, cache, emp.Position.X, emp.Position.Y, 0.5f, color, scale);

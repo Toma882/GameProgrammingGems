@@ -78,8 +78,8 @@ public class StateMachineDefinition<TState, TEvent, TContext>
     }
 
     private readonly Dictionary<TState, StateBehavior> _stateBehaviors = new();
-    private readonly List<Transition> _transitions = new();
-    private readonly Dictionary<TState, List<Transition>> _transitionLookup = new();
+    private readonly List<TransitionDefinition> _transitions = new();
+    private readonly Dictionary<TState, List<TransitionDefinition>> _transitionLookup = new();
     private TState _initialState;
 
     /// <summary>
@@ -116,7 +116,7 @@ public class StateMachineDefinition<TState, TEvent, TContext>
     public StateMachineDefinition<TState, TEvent, TContext>
         Transition(TState from, TState to, TransitionCondition condition)
     {
-        var transition = new Transition
+        var transition = new TransitionDefinition
         {
             From = from,
             To = to,
@@ -126,7 +126,7 @@ public class StateMachineDefinition<TState, TEvent, TContext>
 
         if (!_transitionLookup.TryGetValue(from, out var list))
         {
-            list = new List<Transition>();
+            list = new List<TransitionDefinition>();
             _transitionLookup[from] = list;
         }
         list.Add(transition);
@@ -140,7 +140,7 @@ public class StateMachineDefinition<TState, TEvent, TContext>
     public StateMachineDefinition<TState, TEvent, TContext>
         OnEvent(TState from, TState to, TEvent eventTrigger)
     {
-        var transition = new Transition
+        var transition = new TransitionDefinition
         {
             From = from,
             To = to,
@@ -150,7 +150,7 @@ public class StateMachineDefinition<TState, TEvent, TContext>
 
         if (!_transitionLookup.TryGetValue(from, out var list))
         {
-            list = new List<Transition>();
+            list = new List<TransitionDefinition>();
             _transitionLookup[from] = list;
         }
         list.Add(transition);
@@ -197,10 +197,10 @@ public class StateMachineDefinition<TState, TEvent, TContext>
     /// <summary>
     /// 获取从指定状态出发的所有转换
     /// </summary>
-    internal List<Transition> GetTransitionsFrom(TState state)
+    internal List<TransitionDefinition> GetTransitionsFrom(TState state)
     {
         _transitionLookup.TryGetValue(state, out var list);
-        return list ?? new List<Transition>();
+        return list ?? new List<TransitionDefinition>();
     }
 
     /// <summary>

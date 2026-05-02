@@ -2,6 +2,7 @@
  * Ported to C# from Game Programming Gems 1
  */
 
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.AI.Boids;

@@ -3,6 +3,7 @@
  */
 
 using GPGems.Core.Graphics;
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.AI.Boids;
@@ -45,6 +46,17 @@ public class Flock
         WorldBounds = new BoundingBox(-50, 50, -50, 50, -50, 50);
     }
 
+    /// <summary>添加单个 Boid</summary>
+    public void AddBoid(Vector3 position, Vector3 velocity)
+    {
+        var boid = new Boid(
+            id: Boids.Count,
+            initialPosition: position,
+            initialVelocity: velocity
+        );
+        Boids.Add(boid);
+    }
+
     /// <summary>创建指定数量的 Boid，随机分布</summary>
     public void SpawnBoids(int count)
     {
@@ -71,7 +83,10 @@ public class Flock
     }
 
     /// <summary>更新整个群体一帧（两阶段：先算力，再统一更新位置）</summary>
-    public void Update()
+    public void Update() => Update(Settings, WorldBounds);
+
+    /// <summary>更新整个群体一帧（使用指定配置和边界）</summary>
+    public void Update(BoidSettings settings, BoundingBox worldBounds)
     {
         // 同步群体目标到所有Boid
         if (GroupTarget.HasValue)
@@ -85,13 +100,13 @@ public class Flock
         // Phase 1: 所有 Boid 基于当前帧状态计算转向力（互不干扰）
         foreach (var boid in Boids)
         {
-            boid.ComputeForces(Settings, this);
+            boid.ComputeForces(settings, this);
         }
 
         // Phase 2: 所有 Boid 统一应用转向力并更新位置（消除顺序依赖）
         foreach (var boid in Boids)
         {
-            boid.Integrate(Settings, WorldBounds);
+            boid.Integrate(settings, worldBounds);
         }
     }
 

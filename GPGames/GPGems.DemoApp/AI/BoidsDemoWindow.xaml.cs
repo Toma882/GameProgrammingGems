@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Input;
 using GPGems.AI.Boids;
 using GPGems.Core.Graphics;
+using System.Numerics;
 using GPGems.Core.Math;
 
 namespace GPGems.DemoApp;
