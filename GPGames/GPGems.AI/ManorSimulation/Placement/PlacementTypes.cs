@@ -22,6 +22,10 @@ public enum BuildingType
 {
     /// <summary>道路</summary>
     Road,
+    /// <summary>入口</summary>
+    Entrance,
+    /// <summary>出口</summary>
+    Exit,
     /// <summary>围栏/围墙</summary>
     Fence,
     /// <summary>房屋/建筑</summary>

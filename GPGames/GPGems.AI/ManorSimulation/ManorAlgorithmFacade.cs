@@ -45,7 +45,7 @@ namespace GPGems.AI.ManorSimulation
         /// </summary>
         /// <param name="mapWidth">地图格子数X</param>
         /// <param name="mapHeight">地图格子数Y</param>
-        public void Initialize(int mapWidth = 100, int mapHeight = 100)
+        public void Initialize(int mapWidth = 50, int mapHeight = 50)
         {
             Map = new GridMap(mapWidth, mapHeight);
             LayeredMap = new LayeredGridMap(mapWidth, mapHeight);

@@ -30,8 +30,8 @@ public class BuildingFootprint
     /// <summary>是否阻挡通行</summary>
     public bool BlocksMovement { get; set; } = true;
 
-    /// <summary>所属图层</summary>
-    public MapLayer Layer { get; set; } = MapLayer.Building;
+    /// <summary>建筑楼层数（垂直高度）</summary>
+    public int FloorCount { get; set; } = 1;
 
     /// <summary>自定义形状掩码（true=占用，Width x Height大小）</summary>
     public bool[,]? CustomMask { get; set; }

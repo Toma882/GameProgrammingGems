@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using GPGems.AI.ManorSimulation;
+using GPGems.AI.ManorSimulation.Placement;
 
 namespace GPGems.Visualization.ManorGameDemos;
 
@@ -17,9 +18,9 @@ public class PlacementScene : IDemoScene
     private const int MapHeight = 30;
 
     // ISO 投影参数
-    private const float TileWidth = 64;    // ISO 瓦片宽度
-    private const float TileHeight = 32;     // ISO 瓦片高度
-    private const float FloorOffset = 40;       // 每层楼之间的Y偏移
+    private const float TileWidth = 32;    // ISO 瓦片宽度
+    private const float TileHeight = 16;     // ISO 瓦片高度
+    private const float FloorOffset = 20;       // 每层楼之间的Y偏移
 
     // 当前状态
     private BuildingFootprint? _selectedBuilding;
@@ -46,31 +47,31 @@ public class PlacementScene : IDemoScene
             new BuildingFootprint(BuildingType.Shop, 2, 2)
             {
                 BlocksMovement = true,
-                Height = 1  // 建筑高度（层数）
+                FloorCount = 1
             },
             // 大商店 3x3
             new BuildingFootprint(BuildingType.Shop, 3, 3)
             {
                 BlocksMovement = true,
-                Height = 2
+                FloorCount = 2
             },
             // 餐厅 4x3
             new BuildingFootprint(BuildingType.Restaurant, 4, 3)
             {
                 BlocksMovement = true,
-                Height = 1
+                FloorCount = 1
             },
             // 高楼 2x2 高2层
             new BuildingFootprint(BuildingType.Attraction, 2, 2)
             {
                 BlocksMovement = true,
-                Height = 2
+                FloorCount = 2
             },
             // 楼梯 2x1
             new BuildingFootprint(BuildingType.Road, 2, 1)
             {
                 BlocksMovement = false,
-                Height = 0
+                FloorCount = 0
             }
         };
 
@@ -118,7 +119,7 @@ public class PlacementScene : IDemoScene
         float isoX = (gridX - gridY) * (TileWidth / 2);
         float isoY = (gridX + gridY) * (TileHeight / 2);
         isoY -= floor * FloorOffset;
-        return (isoX + 400, isoY + 300); // 居中偏移
+        return (isoX + 400, isoY + 50); // 居中偏移
     }
 
     /// <summary>
@@ -127,7 +128,7 @@ public class PlacementScene : IDemoScene
     public (int gridX, int gridY) ScreenToGrid(double screenX, double screenY)
     {
         float sx = (float)(screenX - 400);
-        float sy = (float)(screenY - 300);
+        float sy = (float)(screenY - 50);
         sy += _currentFloor * FloorOffset;
 
         int gridX = (int)((sx / (TileWidth / 2) + sy / (TileHeight / 2)) / 2);
@@ -223,7 +224,7 @@ public class PlacementScene : IDemoScene
                     floorColor.R,
                     floorColor.G,
                     floorColor.B)),
-                Stroke = new SolidColorBrush(Color.FromArgb((byte)(alpha * 128), 100, 100, 100),
+                Stroke = new SolidColorBrush(Color.FromArgb((byte)(alpha * 128), 100, 100, 100)),
                 StrokeThickness = 1,
                 Points =
                 {
@@ -231,7 +232,7 @@ public class PlacementScene : IDemoScene
                     new Point(sx + TileWidth / 2, sy + TileHeight / 2),
                     new Point(sx, sy + TileHeight),
                     new Point(sx - TileWidth / 2, sy + TileHeight / 2)
-                }
+                },
             };
             canvas.Children.Add(polygon);
             cache.Add(polygon);
@@ -246,12 +247,11 @@ public class PlacementScene : IDemoScene
         // 获取建筑锚点位置
         var (baseX, baseY) = GridToScreen(obj.AnchorX, obj.AnchorY, floor);
 
-        // 建筑物颜色按高度变化
-        byte brightness = (byte)(120 + obj.Footprint.Height * 40);
-        var buildingColor = Color.FromRgb(
-            (byte)(100 + floor * 30),
-            (byte)(80 + floor * 20),
-            brightness);
+        // 使用 ManorColors 获取建筑物颜色
+        var buildingColor = ManorColors.GetBuildingColor(obj.Footprint);
+
+        // 根据建筑大小调整绘制尺寸
+        float scale = Math.Min(obj.Footprint.Width, obj.Footprint.Height);
 
         // 绘制建筑物顶面（ISO菱形）
         var topPolygon = new Polygon
@@ -261,27 +261,47 @@ public class PlacementScene : IDemoScene
             StrokeThickness = 2,
             Points =
             {
-                new Point(baseX, baseY - 20),
-                new Point(baseX + 30, baseY - 5),
-                new Point(baseX, baseY + 10),
-                new Point(baseX - 30, baseY - 5)
+                new Point(baseX, baseY - 5 * scale),
+                new Point(baseX + 7.5f * scale, baseY - 1.25f * scale),
+                new Point(baseX, baseY + 2.5f * scale),
+                new Point(baseX - 7.5f * scale, baseY - 1.25f * scale)
             }
         };
         canvas.Children.Add(topPolygon);
         cache.Add(topPolygon);
 
-        // 绘制楼层标签
+        // 绘制建筑标签：格式 "图标类型-Id-F楼层"
+        var (typeName, icon) = GetBuildingTypeInfo(obj.Footprint.Type);
         var label = new TextBlock
         {
-            Text = $"F{floor + 1}",
+            Text = $"{icon}{typeName}-{obj.Id}-F{floor + 1}",
             Foreground = new SolidColorBrush(Colors.White),
             FontSize = 10,
             FontWeight = FontWeights.Bold
         };
-        Canvas.SetLeft(label, baseX - 10);
-        Canvas.SetTop(label, baseY - 8);
+        Canvas.SetLeft(label, baseX - 20);
+        Canvas.SetTop(label, baseY - 2);
         canvas.Children.Add(label);
-        cache.Add(label);
+    }
+
+    private static (string name, string icon) GetBuildingTypeInfo(BuildingType type)
+    {
+        return type switch
+        {
+            BuildingType.Entrance => ("入口", "🚪"),
+            BuildingType.Exit => ("出口", "🏁"),
+            BuildingType.Attraction => ("景点", "🎡"),
+            BuildingType.Shop => ("商店", "🏪"),
+            BuildingType.Restaurant => ("餐厅", "🍽️"),
+            BuildingType.Road => ("楼梯", "🪜"),
+            BuildingType.Fence => ("围栏", "📦"),
+            BuildingType.House => ("房屋", "🏠"),
+            BuildingType.Habitat => ("栖息地", "🦁"),
+            BuildingType.StaffFacility => ("员工", "👷"),
+            BuildingType.Plant => ("植物", "🌳"),
+            BuildingType.Decoration => ("装饰", "🎀"),
+            _ => ("", "")
+        };
     }
 
     private void DrawPlacementPreview(Canvas canvas, List<Shape> cache)
@@ -303,10 +323,10 @@ public class PlacementScene : IDemoScene
             StrokeDashArray = { 4, 2 },
             Points =
             {
-                new Point(baseX, baseY - 20),
-                new Point(baseX + 40, baseY),
-                new Point(baseX, baseY + 20),
-                new Point(baseX - 40, baseY)
+                new Point(baseX, baseY - 10),
+                new Point(baseX + 20, baseY),
+                new Point(baseX, baseY + 10),
+                new Point(baseX - 20, baseY)
             }
         };
         canvas.Children.Add(previewPolygon);

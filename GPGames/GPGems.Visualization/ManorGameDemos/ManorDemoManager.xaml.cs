@@ -30,6 +30,7 @@ namespace GPGems.Visualization.ManorGameDemos
         private EmployeeAIScene _employeeScene;
         private EvacuationScene _evacuationScene;
         private PlacementScene _placementScene;
+        private ManorIntegratedScene _integratedScene;
 
         // 渲染缓存
         private List<Shape> _renderCache = new List<Shape>();
@@ -39,7 +40,7 @@ namespace GPGems.Visualization.ManorGameDemos
             InitializeComponent();
             InitializeTimer();
             InitializeScenes();
-            DemoSelector.SelectedIndex = 0;
+            DemoSelector.SelectedIndex = 5; // 默认选中整合庄园模拟
         }
 
         private void InitializeTimer()
@@ -57,6 +58,7 @@ namespace GPGems.Visualization.ManorGameDemos
             _employeeScene = new EmployeeAIScene();
             _evacuationScene = new EvacuationScene();
             _placementScene = new PlacementScene();
+            _integratedScene = new ManorIntegratedScene();
         }
 
         private void DemoSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -67,6 +69,7 @@ namespace GPGems.Visualization.ManorGameDemos
             RenderCanvas.MouseRightButtonDown -= RenderCanvas_MouseRightButtonDown;
 
             PlacementPanel.Visibility = Visibility.Collapsed;
+            IntegratedPanel.Visibility = Visibility.Collapsed;
 
             switch (DemoSelector.SelectedIndex)
             {
@@ -90,12 +93,26 @@ namespace GPGems.Visualization.ManorGameDemos
                     _currentScene = _placementScene;
                     PlacementPanel.Visibility = Visibility.Visible;
                     SceneDescription.Text = "演示：位掩码多层地图的建筑物放置系统。\n\n数据结构：byte[,] 位图，每个格子1字节 = 8个图层\n\n操作：鼠标悬停预览，左键放置，右键删除";
+                    // 先初始化再设置选择器（避免 Render 时 Facade 未初始化）
+                    ResetCurrentScene();
                     // 注册鼠标事件
                     RenderCanvas.MouseMove += RenderCanvas_MouseMove;
                     RenderCanvas.MouseLeftButtonDown += RenderCanvas_MouseLeftButtonDown;
                     RenderCanvas.MouseRightButtonDown += RenderCanvas_MouseRightButtonDown;
                     BuildingSelector.SelectedIndex = 0;
-                    break;
+                    return; // 已调用 Reset，避免重复执行
+                case 5:
+                    _currentScene = _integratedScene;
+                    IntegratedPanel.Visibility = Visibility.Visible;
+                    SceneDescription.Text = "🏰 整合庄园模拟：通过放置建筑定义地图功能\n\n放置入口/出口/景点后，点击开始模拟即可观察客流动态\n\n操作：鼠标悬停预览，左键放置，右键删除建筑";
+                    // 先初始化再设置选择器（避免 Render 时 Facade 未初始化）
+                    ResetCurrentScene();
+                    // 注册鼠标事件
+                    RenderCanvas.MouseMove += IntegratedScene_MouseMove;
+                    RenderCanvas.MouseLeftButtonDown += IntegratedScene_MouseLeftButtonDown;
+                    RenderCanvas.MouseRightButtonDown += IntegratedScene_MouseRightButtonDown;
+                    IntegratedBuildingSelector.SelectedIndex = 0;
+                    return; // 已调用 Reset，避免重复执行
             }
 
             ResetCurrentScene();
@@ -176,8 +193,22 @@ namespace GPGems.Visualization.ManorGameDemos
 
         #region 放置场景事件
 
+        private void Floor_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_placementScene == null) return;
+
+            if (Floor0.IsChecked == true) _placementScene.CurrentFloor = 0;
+            else if (Floor1.IsChecked == true) _placementScene.CurrentFloor = 1;
+            else if (Floor2.IsChecked == true) _placementScene.CurrentFloor = 2;
+
+            if (_currentScene == _placementScene)
+                Render();
+        }
+
         private void BuildingSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (_placementScene == null) return;
+
             if (BuildingSelector.SelectedItem is ComboBoxItem item && item.Tag is string tag)
             {
                 int index = int.Parse(tag);
@@ -193,15 +224,14 @@ namespace GPGems.Visualization.ManorGameDemos
         private void BtnPlace_Click(object sender, RoutedEventArgs e)
         {
             _placementScene.PlaceCurrent();
-            // 更新统计
-            StatsCollisions.Text = $"已放置建筑: {_placementScene.GetStat("")}";
+            StatsCollisions.Text = $"本层建筑: {_placementScene.GetStat("")}";
             Render();
         }
 
         private void BtnClearAll_Click(object sender, RoutedEventArgs e)
         {
             _placementScene.Reset(0, 0);
-            StatsCollisions.Text = "已放置建筑: 0";
+            StatsCollisions.Text = "本层建筑: 0";
             Render();
         }
 
@@ -224,7 +254,7 @@ namespace GPGems.Visualization.ManorGameDemos
             int id = _placementScene.PlaceCurrent();
             if (id > 0)
             {
-                StatsCollisions.Text = $"已放置建筑: {_placementScene.GetStat("")}";
+                StatsCollisions.Text = $"本层建筑: {_placementScene.GetStat("")}";
             }
             Render();
         }
@@ -234,15 +264,128 @@ namespace GPGems.Visualization.ManorGameDemos
             var pos = e.GetPosition(RenderCanvas);
             var (gx, gy) = _placementScene.ScreenToGrid(pos.X, pos.Y);
 
-            // 依次尝试删除各图层
-            bool removed = false;
-            removed |= _placementScene.RemoveAt(gx, gy, MapLayer.Building);
-            removed |= _placementScene.RemoveAt(gx, gy, MapLayer.Decoration);
-            removed |= _placementScene.RemoveAt(gx, gy, MapLayer.Path);
-
+            bool removed = _placementScene.RemoveAt(gx, gy);
             if (removed)
             {
-                StatsCollisions.Text = $"已放置建筑: {_placementScene.GetStat("")}";
+                StatsCollisions.Text = $"本层建筑: {_placementScene.GetStat("")}";
+            }
+            Render();
+        }
+
+        #endregion
+
+        #region 整合庄园场景事件
+
+        private void IntFloor_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_integratedScene == null) return;
+
+            if (IntFloor0.IsChecked == true) _integratedScene.CurrentFloor = 0;
+            else if (IntFloor1.IsChecked == true) _integratedScene.CurrentFloor = 1;
+            else if (IntFloor2.IsChecked == true) _integratedScene.CurrentFloor = 2;
+
+            if (_currentScene == _integratedScene)
+                Render();
+        }
+
+        private void IntegratedBuildingSelector_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (_integratedScene == null) return;
+
+            if (IntegratedBuildingSelector.SelectedItem is ComboBoxItem item && item.Tag is string tag)
+            {
+                int index = int.Parse(tag);
+                if (index >= 0 && index < _integratedScene.BuildingPresets.Count)
+                {
+                    _integratedScene.SelectedBuilding = _integratedScene.BuildingPresets[index];
+                }
+            }
+            if (_currentScene == _integratedScene)
+                Render();
+        }
+
+        private void BtnIntPlace_Click(object sender, RoutedEventArgs e)
+        {
+            _integratedScene.PlaceCurrent();
+            StatsCollisions.Text = $"建筑总数: {_integratedScene.GetStat("buildingCount")}";
+            Render();
+        }
+
+        private void BtnIntClear_Click(object sender, RoutedEventArgs e)
+        {
+            _integratedScene.Reset(0, 0);
+            StatsCollisions.Text = "建筑总数: 0";
+            Render();
+        }
+
+        private void BtnStartSim_Click(object sender, RoutedEventArgs e)
+        {
+            // 应用所有参数
+            _integratedScene.EnableVisitorFlow = ChkVisitorFlow.IsChecked == true;
+            _integratedScene.EnableAnimalGroup = ChkAnimalGroup.IsChecked == true;
+            _integratedScene.EnableEmployeeTask = ChkEmployeeTask.IsChecked == true;
+            _integratedScene.EnableEvacuation = ChkEvacuation.IsChecked == true;
+
+            _integratedScene.VisitorCount = (int)SliderVisitorCount.Value;
+            _integratedScene.VisitorSpeed = (float)SliderVisitorSpeed.Value;
+            _integratedScene.EnableORCA = ChkORCA.IsChecked == true;
+
+            _integratedScene.AnimalCount = (int)SliderAnimalCount.Value;
+            _integratedScene.BoidsCohesion = (float)SliderCohesion.Value;
+            _integratedScene.BoidsAlignment = (float)SliderAlignment.Value;
+            _integratedScene.BoidsSeparation = (float)SliderSeparation.Value;
+
+            _integratedScene.EmployeeCount = (int)SliderEmployeeCount.Value;
+            _integratedScene.TaskCount = (int)SliderTaskCount.Value;
+
+            _integratedScene.EvacuationCount = (int)SliderEvacCount.Value;
+
+            _integratedScene.StartSimulation();
+            StatsCollisions.Text = $"建筑: {_integratedScene.GetStat("buildingCount")} | 游客: {_integratedScene.GetStat("visitorCount")} | 动物: {_integratedScene.GetStat("animalCount")}";
+        }
+
+        private void BtnStopSim_Click(object sender, RoutedEventArgs e)
+        {
+            _integratedScene.StopSimulation();
+            StatsCollisions.Text = $"本层建筑: {_integratedScene.GetStat("buildingCount")}";
+        }
+
+        private void IntegratedScene_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
+        {
+            if (_integratedScene.IsSimulating) return;
+
+            var pos = e.GetPosition(RenderCanvas);
+            var (gx, gy) = _integratedScene.ScreenToGrid(pos.X, pos.Y);
+            _integratedScene.PreviewX = gx;
+            _integratedScene.PreviewY = gy;
+            Render();
+        }
+
+        private void IntegratedScene_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+
+            var pos = e.GetPosition(RenderCanvas);
+            var (gx, gy) = _integratedScene.ScreenToGrid(pos.X, pos.Y);
+            _integratedScene.PreviewX = gx;
+            _integratedScene.PreviewY = gy;
+
+            int id = _integratedScene.PlaceCurrent();
+            if (id > 0)
+            {
+                StatsCollisions.Text = $"本层建筑: {_integratedScene.GetStat("buildingCount")}";
+            }
+            Render();
+        }
+
+        private void IntegratedScene_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
+        {
+            var pos = e.GetPosition(RenderCanvas);
+            var (gx, gy) = _integratedScene.ScreenToGrid(pos.X, pos.Y);
+
+            bool removed = _integratedScene.RemoveAt(gx, gy);
+            if (removed)
+            {
+                StatsCollisions.Text = $"本层建筑: {_integratedScene.GetStat("buildingCount")}";
             }
             Render();
         }
