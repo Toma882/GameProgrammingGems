@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace GPGames.ManorSimulation.EmployeeTasks;
+namespace GPGames.ManorSimulation;
 
 /// <summary>
 /// 服务任务
