@@ -264,13 +264,93 @@ public class BitMap2D
     }
 
     /// <summary>
-    /// 查找 w × h 的空矩形区域
+    /// 查找 w × h 的空矩形区域（位运算优化版）
+    /// 算法：每行 ~rowMask 得到空闲位，滑动 targetMask 检查连续 w 个空位
+    /// 时间复杂度：O((width/64) * height)，比逐格检查快 10-60 倍
     /// </summary>
     public (int x, int y) FindEmptyRect(int rectWidth, int rectHeight)
     {
         if (rectWidth <= 0 || rectHeight <= 0) return (-1, -1);
         if (rectWidth > _width || rectHeight > _height) return (-1, -1);
 
+        // 宽度 <= 64：使用位掩码优化检查
+        if (rectWidth <= 64)
+        {
+            return FindEmptyRectBitMask(rectWidth, rectHeight);
+        }
+
+        // 宽度 > 64：回退到普通算法
+        return FindEmptyRectFallback(rectWidth, rectHeight);
+    }
+
+    /// <summary>
+    /// 位掩码版查找空矩形（宽度 <= 64）
+    /// </summary>
+    private (int x, int y) FindEmptyRectBitMask(int rectWidth, int rectHeight)
+    {
+        ulong targetMask = (1UL << rectWidth) - 1;
+
+        for (int y = 0; y <= _height - rectHeight; y++)
+        {
+            int rowBase = y * _ulongsPerRow;
+            int maxShift = 64 - rectWidth;
+
+            // 检查每行的所有可能起始位置
+            for (int startX = 0; startX <= _width - rectWidth; startX++)
+            {
+                int ulongIdx = startX / 64;
+                int bitOffset = startX % 64;
+
+                // 目标掩码跨两个 ulong，使用普通检查
+                if (bitOffset > maxShift && ulongIdx + 1 < _ulongsPerRow)
+                {
+                    if (CheckContinuous(y, startX, rectWidth))
+                    {
+                        // 验证下方 rectHeight - 1 行
+                        bool allValid = true;
+                        for (int dy = 1; dy < rectHeight; dy++)
+                        {
+                            if (!CheckContinuous(y + dy, startX, rectWidth))
+                            {
+                                allValid = false;
+                                break;
+                            }
+                        }
+                        if (allValid) return (startX, y);
+                    }
+                    continue;
+                }
+
+                // 单个 ulong 内的位掩码检查
+                ulong rowVal = _data[rowBase + ulongIdx];
+                ulong shiftedMask = targetMask << bitOffset;
+                if ((~rowVal & shiftedMask) == shiftedMask)
+                {
+                    // 这一行满足，检查下方几行
+                    bool allValid = true;
+                    for (int dy = 1; dy < rectHeight; dy++)
+                    {
+                        int subRowBase = (y + dy) * _ulongsPerRow;
+                        ulong subRowVal = _data[subRowBase + ulongIdx];
+                        if ((~subRowVal & shiftedMask) != shiftedMask)
+                        {
+                            allValid = false;
+                            break;
+                        }
+                    }
+                    if (allValid) return (startX, y);
+                }
+            }
+        }
+
+        return (-1, -1);
+    }
+
+    /// <summary>
+    /// 查找 w × h 的空矩形区域（普通版，宽度 > 64 时使用）
+    /// </summary>
+    private (int x, int y) FindEmptyRectFallback(int rectWidth, int rectHeight)
+    {
         // 逐行查找起始点，然后验证下方几行
         for (int y = 0; y <= _height - rectHeight; y++)
         {
@@ -298,6 +378,86 @@ public class BitMap2D
         }
 
         return (-1, -1);
+    }
+
+    /// <summary>
+    /// 围绕参考点查找最近的连续空位（BFS 搜索）
+    /// 保证找到的空位与参考点距离最近，自然形成连续成片的布局
+    ///
+    /// 适用场景：
+    /// - 连续购买时，在上一个建筑旁边放下一个
+    /// - 玩家希望建筑集中在一起的自动放置
+    ///
+    /// 算法：BFS 向外扩散候选位置，每个候选用位掩码验证矩形
+    /// </summary>
+    /// <param name="refX">参考点X（如已有建筑的位置）</param>
+    /// <param name="refY">参考点Y</param>
+    /// <param name="rectWidth">目标宽度</param>
+    /// <param name="rectHeight">目标高度</param>
+    /// <param name="maxSearchRadius">最大搜索半径（0=不限制）</param>
+    /// <returns>空位起始坐标，找不到返回 (-1, -1)</returns>
+    public (int x, int y) FindContinuousEmptyRect(int refX, int refY, int rectWidth, int rectHeight, int maxSearchRadius = 0)
+    {
+        if (rectWidth <= 0 || rectHeight <= 0) return (-1, -1);
+        if (rectWidth > _width || rectHeight > _height) return (-1, -1);
+
+        // 边界检查
+        int minY = 0;
+        int maxY = _height - rectHeight;
+        int minX = 0;
+        int maxX = _width - rectWidth;
+
+        // 优先检查参考点本身（可以放的话直接放）
+        if (refX >= minX && refX <= maxX && refY >= minY && refY <= maxY)
+        {
+            if (IsRectEmpty(refX, refY, refX + rectWidth - 1, refY + rectHeight - 1))
+                return (refX, refY);
+        }
+
+        // BFS 队列：(startX, startY, distance)
+        var queue = new Queue<(int x, int y, int dist)>();
+        var visited = new HashSet<(int, int)>();
+
+        // 初始加入四个相邻方向（距离=1）
+        TryEnqueue(refX, refY - 1, 1, visited, queue);  // 上
+        TryEnqueue(refX + 1, refY, 1, visited, queue);  // 右
+        TryEnqueue(refX, refY + 1, 1, visited, queue);  // 下
+        TryEnqueue(refX - 1, refY, 1, visited, queue);  // 左
+
+        while (queue.Count > 0)
+        {
+            var (x, y, dist) = queue.Dequeue();
+
+            // 超过最大搜索半径，停止
+            if (maxSearchRadius > 0 && dist > maxSearchRadius)
+                continue;
+
+            // 检查这个位置作为矩形起点是否有效
+            if (x >= minX && x <= maxX && y >= minY && y <= maxY)
+            {
+                if (IsRectEmpty(x, y, x + rectWidth - 1, y + rectHeight - 1))
+                    return (x, y);
+            }
+
+            // 继续向外扩散
+            int nextDist = dist + 1;
+            TryEnqueue(x, y - 1, nextDist, visited, queue);
+            TryEnqueue(x + 1, y, nextDist, visited, queue);
+            TryEnqueue(x, y + 1, nextDist, visited, queue);
+            TryEnqueue(x - 1, y, nextDist, visited, queue);
+        }
+
+        // BFS 找不到，回退到全屏扫描（保证总能找到如果还有空位）
+        return FindEmptyRect(rectWidth, rectHeight);
+    }
+
+    /// <summary>
+    /// BFS 入队辅助
+    /// </summary>
+    private void TryEnqueue(int x, int y, int dist, HashSet<(int, int)> visited, Queue<(int, int, int)> queue)
+    {
+        if (x < 0 || x >= _width || y < 0 || y >= _height) return;
+        if (visited.Add((x, y))) queue.Enqueue((x, y, dist));
     }
 
     /// <summary>

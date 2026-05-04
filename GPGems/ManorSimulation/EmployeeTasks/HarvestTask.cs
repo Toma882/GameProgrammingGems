@@ -10,9 +10,13 @@ public class HarvestTask : EmployeeTaskBase
     public string ResourceType { get; set; } = string.Empty;
     public int Amount { get; set; }
 
-    public HarvestTask(Vector2 position, float duration = 5f)
+    public HarvestTask()
     {
         Type = "Harvest";
+    }
+
+    public HarvestTask(Vector2 position, float duration = 5f) : this()
+    {
         TargetPosition = position;
         Duration = duration;
     }

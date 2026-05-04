@@ -19,15 +19,20 @@ public class TaskScheduler
     private readonly Queue<TaskBase> _pendingQueue = new();
     private readonly List<TaskBase> _runningTasks = new();
     private readonly PriorityQueue<TaskBase, int> _priorityQueue = new();
+    private readonly List<TaskBase> _suspendedTasks = new();
 
     // 关系注册表（业务类注册自己的关系提供者）
     private readonly Dictionary<Type, ITaskRelationProvider> _relationProviders = new();
+
+    // 任务组注册表
+    private readonly Dictionary<Guid, TaskGroup> _taskGroups = new();
 
     // 统计
     public int TotalSubmitted { get; private set; }
     public int TotalCompleted { get; private set; }
     public int RunningCount => _runningTasks.Count;
     public int PendingCount => _pendingQueue.Count + _priorityQueue.UnorderedItems.Count();
+    public int SuspendedCount => _suspendedTasks.Count;
 
     private TaskScheduler() { }
 
@@ -58,13 +63,52 @@ public class TaskScheduler
     }
 
     /// <summary>
+    /// 批量提交任务
+    /// </summary>
+    public void SubmitAll(IEnumerable<TaskBase> tasks)
+    {
+        foreach (var task in tasks)
+            Submit(task);
+    }
+
+    /// <summary>
+    /// 暂停指定任务
+    /// </summary>
+    public void Suspend(Guid taskId)
+    {
+        var task = _runningTasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (task != null)
+        {
+            task.State = TaskLifecycle.Suspended;
+            _runningTasks.Remove(task);
+            _suspendedTasks.Add(task);
+        }
+    }
+
+    /// <summary>
+    /// 恢复指定任务
+    /// </summary>
+    public void Resume(Guid taskId)
+    {
+        var task = _suspendedTasks.FirstOrDefault(t => t.TaskId == taskId);
+        if (task != null)
+        {
+            _suspendedTasks.Remove(task);
+            task.State = TaskLifecycle.Running;
+            _runningTasks.Add(task);
+        }
+    }
+
+    /// <summary>
     /// 取消指定任务
     /// </summary>
     public void Cancel(Guid taskId)
     {
-        // 从运行队列查找并取消
         var running = _runningTasks.FirstOrDefault(t => t.TaskId == taskId);
         running?.Cancel();
+
+        var suspended = _suspendedTasks.FirstOrDefault(t => t.TaskId == taskId);
+        suspended?.Cancel();
     }
 
     /// <summary>
@@ -177,6 +221,7 @@ public class TaskScheduler
         task.State = TaskLifecycle.Completed;
         TotalCompleted++;
         task.OnComplete?.Invoke(task);
+        task.OnProgress?.Invoke(task, 1f);
     }
 
     private void FailTask(TaskBase task, Exception ex)
@@ -184,4 +229,89 @@ public class TaskScheduler
         task.State = TaskLifecycle.Failed;
         task.OnFail?.Invoke(task, ex);
     }
+
+    #region 查询 API
+
+    /// <summary>
+    /// 获取所有运行中的任务
+    /// </summary>
+    public IEnumerable<TaskBase> GetRunningTasks() => _runningTasks.AsReadOnly();
+
+    /// <summary>
+    /// 获取所有暂停的任务
+    /// </summary>
+    public IEnumerable<TaskBase> GetSuspendedTasks() => _suspendedTasks.AsReadOnly();
+
+    /// <summary>
+    /// 根据条件查找任务
+    /// </summary>
+    public IEnumerable<TaskBase> FindTasks(Func<TaskBase, bool> predicate)
+    {
+        return _runningTasks.Concat(_suspendedTasks).Where(predicate);
+    }
+
+    /// <summary>
+    /// 根据 TaskId 查找任务
+    /// </summary>
+    public TaskBase? FindTask(Guid taskId)
+    {
+        return FindTasks(t => t.TaskId == taskId).FirstOrDefault();
+    }
+
+    /// <summary>
+    /// 根据类型查找任务
+    /// </summary>
+    public IEnumerable<T> FindTasksByType<T>() where T : TaskBase
+    {
+        return FindTasks(t => t is T).Cast<T>();
+    }
+
+    #endregion
+
+    #region 任务组管理
+
+    /// <summary>
+    /// 注册任务组
+    /// </summary>
+    public void RegisterTaskGroup(TaskGroup group)
+    {
+        _taskGroups[group.GroupId] = group;
+    }
+
+    /// <summary>
+    /// 获取任务组
+    /// </summary>
+    public TaskGroup? GetTaskGroup(Guid groupId)
+    {
+        return _taskGroups.TryGetValue(groupId, out var group) ? group : null;
+    }
+
+    /// <summary>
+    /// 暂停整个任务组
+    /// </summary>
+    public void SuspendGroup(Guid groupId)
+    {
+        if (_taskGroups.TryGetValue(groupId, out var group))
+            group.SuspendAll();
+    }
+
+    /// <summary>
+    /// 恢复整个任务组
+    /// </summary>
+    public void ResumeGroup(Guid groupId)
+    {
+        if (_taskGroups.TryGetValue(groupId, out var group))
+            group.ResumeAll();
+    }
+
+    /// <summary>
+    /// 取消整个任务组
+    /// </summary>
+    public void CancelGroup(Guid groupId)
+    {
+        if (_taskGroups.TryGetValue(groupId, out var group))
+            group.CancelAll();
+    }
+
+    #endregion
 }

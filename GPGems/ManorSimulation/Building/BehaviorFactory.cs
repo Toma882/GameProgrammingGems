@@ -1,0 +1,153 @@
+using System;
+using System.Collections.Generic;
+
+namespace GPGems.ManorSimulation.Building;
+
+/// <summary>
+/// 行为工厂（享元模式）
+///
+/// �?核心特性：
+/// - 每种行为类型只有一个全局实例
+/// - 1000 个建筑共享同一�?SelectBehavior 实例
+/// - 状态存储在 BehaviorData 中，与逻辑分离
+/// - 零内存浪�?/// </summary>
+public class BehaviorFactory
+{
+    /// <summary>
+    /// 享元缓存：行为名�?�?行为单例
+    /// </summary>
+    private static readonly Dictionary<string, IBehavior> _behaviorCache = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// 全局单例
+    /// </summary>
+    public static BehaviorFactory Instance { get; } = new();
+
+    public BehaviorFactory()
+    {
+        RegisterBuiltInBehaviors();
+    }
+
+    /// <summary>
+    /// 注册内置行为（享元模式：只创建一个实例）
+    /// </summary>
+    private void RegisterBuiltInBehaviors()
+    {
+        RegisterBehavior<SelectBehavior>();
+        RegisterBehavior<MoveBehavior>();
+        RegisterBehavior<RotateBehavior>();
+        RegisterBehavior<PlaceBehavior>();
+        RegisterBehavior<StoreBehavior>();
+        RegisterBehavior<SellBehavior>();
+        RegisterBehavior<UpgradeBehavior>();
+        RegisterBehavior<ProduceBehavior>();
+    }
+
+    /// <summary>
+    /// 注册行为类型（享元模式：只创建一个实例）
+    /// </summary>
+    public void RegisterBehavior<T>() where T : IBehavior, new()
+    {
+        var behavior = new T();
+        _behaviorCache[behavior.Name] = behavior;
+    }
+
+    /// <summary>
+    /// 获取行为实例（享元模式：永远返回同一个实例）
+    /// </summary>
+    public IBehavior? GetBehavior(string behaviorName)
+    {
+        _behaviorCache.TryGetValue(behaviorName, out var behavior);
+        return behavior;
+    }
+
+    /// <summary>
+    /// 创建行为数据实例
+    /// </summary>
+    public BehaviorData? CreateBehaviorData(string behaviorName)
+    {
+        var behavior = GetBehavior(behaviorName);
+        return behavior?.CreateData();
+    }
+
+    /// <summary>
+    /// 检查是否支持指定行�?    /// </summary>
+    public bool HasBehavior(string behaviorName)
+    {
+        return _behaviorCache.ContainsKey(behaviorName);
+    }
+
+    /// <summary>
+    /// 获取缓存统计
+    /// </summary>
+    public int CacheCount => _behaviorCache.Count;
+}
+
+#region 建筑事件常量定义
+
+/// <summary>
+/// 建筑事件类型常量
+/// </summary>
+public static class BuildingEvents
+{
+    /// <summary>选中状态变�?/summary>
+    public const string SelectionChanged = "building.selection_changed";
+
+    /// <summary>移动状态变�?/summary>
+    public const string MoveStateChanged = "building.move_state_changed";
+
+    /// <summary>旋转变化</summary>
+    public const string RotationChanged = "building.rotation_changed";
+
+    /// <summary>放置完成</summary>
+    public const string Placed = "building.placed";
+
+    /// <summary>收纳完成</summary>
+    public const string Stored = "building.stored";
+
+    /// <summary>出售完成</summary>
+    public const string Sold = "building.sold";
+
+    /// <summary>升级完成</summary>
+    public const string LevelUp = "building.level_up";
+
+    /// <summary>升级进度变化</summary>
+    public const string UpgradeProgress = "building.upgrade_progress";
+
+    /// <summary>生产完成</summary>
+    public const string Produced = "building.produced";
+
+    /// <summary>生产进度变化</summary>
+    public const string ProduceProgress = "building.produce_progress";
+}
+
+/// <summary>
+/// 建筑查询类型常量
+/// </summary>
+public static class BuildingQueries
+{
+    /// <summary>检查是否可以移�?/summary>
+    public const string CanMove = "building.can_move";
+
+    /// <summary>检查是否可以放�?/summary>
+    public const string CanPlace = "building.can_place";
+
+    /// <summary>获取出售返还资源</summary>
+    public const string GetSellRefund = "building.get_sell_refund";
+}
+
+/// <summary>
+/// 建筑推送数据类型常�?/// </summary>
+public static class BuildingPushTypes
+{
+    /// <summary>视觉更新</summary>
+    public const string VisualUpdate = "building.visual_update";
+
+    /// <summary>高亮显示</summary>
+    public const string Highlight = "building.highlight";
+
+    /// <summary>位置更新</summary>
+    public const string PositionUpdate = "building.position_update";
+}
+
+#endregion

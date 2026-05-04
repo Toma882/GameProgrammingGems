@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <ItemGroup>
     <ProjectReference Include="..\GPGems.AI\GPGems.AI.csproj" />
+    <ProjectReference Include="..\GPGems.Core\GPGems.Core.csproj" />
   </ItemGroup>
   <PropertyGroup>
     <OutputType>Exe</OutputType>

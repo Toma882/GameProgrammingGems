@@ -77,7 +77,7 @@ public class LayeredGridMap
     /// <summary>
     /// 检查建筑物是否可以放置在指定位置
     /// </summary>
-    public PlacementResult CanPlace(BuildingFootprint footprint, int anchorX, int anchorY, int floor = 0)
+    public PlacementResult CanPlace(Footprint footprint, int anchorX, int anchorY, int floor = 0)
     {
         if (!IsInBounds(anchorX, anchorY, floor))
             return PlacementResult.OutOfBounds;
@@ -109,7 +109,7 @@ public class LayeredGridMap
     /// 放置建筑物
     /// </summary>
     /// <returns>建筑物唯一ID，失败返回0</returns>
-    public int PlaceObject(BuildingFootprint footprint, int anchorX, int anchorY, int floor = 0)
+    public int PlaceObject(Footprint footprint, int anchorX, int anchorY, int floor = 0)
     {
         if (CanPlace(footprint, anchorX, anchorY, floor) != PlacementResult.Valid)
             return 0;
@@ -239,7 +239,7 @@ public class PlacedObject
     public int Id { get; }
 
     /// <summary>占位定义</summary>
-    public BuildingFootprint Footprint { get; }
+    public Footprint Footprint { get; }
 
     /// <summary>锚点X坐标</summary>
     public int AnchorX { get; }
@@ -253,7 +253,7 @@ public class PlacedObject
     /// <summary>自定义数据（用于上层业务）</summary>
     public object? UserData { get; set; }
 
-    public PlacedObject(int id, BuildingFootprint footprint, int anchorX, int anchorY, int floor)
+    public PlacedObject(int id, Footprint footprint, int anchorX, int anchorY, int floor)
     {
         Id = id;
         Footprint = footprint;

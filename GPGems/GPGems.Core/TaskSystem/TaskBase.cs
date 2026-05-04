@@ -8,13 +8,19 @@ namespace GPGems.Core.TaskSystem;
 public abstract class TaskBase
 {
     public Guid TaskId { get; } = Guid.NewGuid();
-    public string Type { get; protected set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
     public TaskLifecycle State { get; internal set; } = TaskLifecycle.Pending;
     public int Priority { get; set; } = 0;
 
     // 任务执行回调（由调度器调用）
-    internal Action<TaskBase>? OnComplete { get; set; }
-    internal Action<TaskBase, Exception>? OnFail { get; set; }
+    public Action<TaskBase>? OnComplete { get; set; }
+    public Action<TaskBase, Exception>? OnFail { get; set; }
+    public Action<TaskBase, float>? OnProgress { get; set; }
+
+    /// <summary>
+    /// 所属任务组ID（可选）
+    /// </summary>
+    public Guid? GroupId { get; set; }
 
     /// <summary>
     /// 由具体任务类实现的执行逻辑

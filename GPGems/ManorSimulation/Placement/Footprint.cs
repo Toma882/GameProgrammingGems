@@ -1,48 +1,46 @@
 using System;
 using System.Collections.Generic;
-using GPGems.AI;
+using GPGems.ManorSimulation.Map;
 
 namespace GPGems.ManorSimulation;
 
 /// <summary>
-/// 建筑物占位定义
-/// 描述一个建筑物在网格地图上的形状和占用范围
-/// </summary>
-public class BuildingFootprint
+/// 占位定义
+/// 描述一个对象（建筑、稻田、水田等）在网格地图上的形状和占用范�?/// </summary>
+public class Footprint : IFootprint
 {
-    /// <summary>建筑物类型</summary>
-    public BuildingType Type { get; }
+    /// <summary>对象名称</summary>
+    public string Name { get; set; } = string.Empty;
 
-    /// <summary>占位宽度（格子数）</summary>
+    /// <summary>对象类型字符�?/summary>
+    public string ObjectType { get; set; } = string.Empty;
+
+    /// <summary>占位宽度（格子数�?/summary>
     public int Width { get; }
 
-    /// <summary>占位高度（格子数）</summary>
+    /// <summary>占位高度（格子数�?/summary>
     public int Height { get; }
 
     /// <summary>占位形状</summary>
     public FootprintShape Shape { get; set; }
 
-    /// <summary>锚点X偏移（相对于占位左上角，0~1）</summary>
+    /// <summary>锚点X偏移（相对于占位左上角，0~1�?/summary>
     public float AnchorX { get; set; } = 0.5f;
 
-    /// <summary>锚点Y偏移（相对于占位左上角，0~1）</summary>
+    /// <summary>锚点Y偏移（相对于占位左上角，0~1�?/summary>
     public float AnchorY { get; set; } = 0.5f;
 
     /// <summary>是否阻挡通行</summary>
     public bool BlocksMovement { get; set; } = true;
 
-    /// <summary>建筑楼层数（垂直高度）</summary>
-    public int FloorCount { get; set; } = 1;
-
-    /// <summary>自定义形状掩码（true=占用，Width x Height大小）</summary>
+    /// <summary>自定义形状掩码（true=占用，Width x Height大小�?/summary>
     public bool[,]? CustomMask { get; set; }
 
     /// <summary>
     /// 创建矩形占位
     /// </summary>
-    public BuildingFootprint(BuildingType type, int width, int height)
+    public Footprint(int width, int height)
     {
-        Type = type;
         Width = width;
         Height = height;
         Shape = FootprintShape.Rectangle;
@@ -51,10 +49,10 @@ public class BuildingFootprint
     /// <summary>
     /// 创建圆形占位
     /// </summary>
-    public static BuildingFootprint CreateCircle(BuildingType type, int radius)
+    public static Footprint CreateCircle(int radius)
     {
         int size = radius * 2 + 1;
-        var footprint = new BuildingFootprint(type, size, size)
+        var footprint = new Footprint(size, size)
         {
             Shape = FootprintShape.Circle
         };
@@ -75,12 +73,12 @@ public class BuildingFootprint
     /// <summary>
     /// 创建自定义形状占位
     /// </summary>
-    public static BuildingFootprint CreateCustom(BuildingType type, int width, int height, bool[,] mask)
+    public static Footprint CreateCustom(int width, int height, bool[,] mask)
     {
         if (mask.GetLength(0) != width || mask.GetLength(1) != height)
             throw new ArgumentException("掩码尺寸不匹配");
 
-        return new BuildingFootprint(type, width, height)
+        return new Footprint(width, height)
         {
             Shape = FootprintShape.Custom,
             CustomMask = mask

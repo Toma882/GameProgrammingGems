@@ -19,7 +19,7 @@ namespace GPGems.TestConsole
 {
     class AlgorithmVerification
     {
-        static void Main(string[] args)
+        static void RunAlgorithmVerification()
         {
             Console.WriteLine("=== Game Programming Gems 算法验证 ===");
             Console.WriteLine();
@@ -161,7 +161,7 @@ namespace GPGems.TestConsole
                     radius: 0.5f,
                     maxSpeed: 3f
                 );
-                agent.Target = new Vector2(100, agent.Position.Y);  // 目标在右边
+                agent.PreferredVel = new Vector2(100, agent.Position.Y);  // 目标在右边
             }
 
             // 右边50个往左走
@@ -172,7 +172,7 @@ namespace GPGems.TestConsole
                     radius: 0.5f,
                     maxSpeed: 3f
                 );
-                agent.Target = new Vector2(0, agent.Position.Y);  // 目标在左边
+                agent.PreferredVel = new Vector2(0, agent.Position.Y);  // 目标在左边
             }
 
             // 运行500帧

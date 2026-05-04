@@ -40,11 +40,27 @@ public abstract class EmployeeTaskBase : TaskBase
     public override bool IsCompleted() => Progress >= Duration;
 
     /// <summary>
+    /// 任务起始位置（用于移动任务）
+    /// </summary>
+    public Vector2 SourcePosition { get; set; }
+
+    /// <summary>
+    /// 关联的建筑ID（可选）
+    /// </summary>
+    public int? BuildingId { get; set; }
+
+    /// <summary>
+    /// 当前进度百分比 (0-1)
+    /// </summary>
+    public float ProgressPercent => Duration > 0 ? MathF.Min(1f, Progress / Duration) : 0f;
+
+    /// <summary>
     /// 执行任务（模板方法）
     /// 具体任务类型可以重写此方法实现特定逻辑
     /// </summary>
     public override void Execute(float deltaTime)
     {
         Progress += deltaTime;
+        OnProgress?.Invoke(this, ProgressPercent);
     }
 }

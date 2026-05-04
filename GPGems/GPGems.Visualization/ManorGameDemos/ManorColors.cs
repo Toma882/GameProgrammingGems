@@ -35,28 +35,24 @@ public static class ManorColors
     }
 
     /// <summary>
-    /// 根据建筑物占位获取建筑颜色
+    /// 根据占位获取对象颜色
     /// </summary>
-    public static Color GetBuildingColor(BuildingFootprint footprint)
+    public static Color GetBuildingColor(Footprint footprint)
     {
-        // 根据建筑类型和高度动态计算颜色
-        byte brightness = (byte)(120 + footprint.FloorCount * 40);
-
-        return footprint.Type switch
+        return footprint.ObjectType.ToLower() switch
         {
-            BuildingType.Entrance => Color.FromRgb(46, 204, 113),
-            BuildingType.Exit => Color.FromRgb(155, 89, 182),
-            BuildingType.Shop => Color.FromRgb(241, 196, 15),
-            BuildingType.Restaurant => Color.FromRgb(230, 126, 34),
-            BuildingType.Attraction => Color.FromRgb(231, 76, 60),
-            BuildingType.Road => Color.FromRgb(149, 165, 166),
-            BuildingType.Fence => Color.FromRgb(127, 140, 141),
-            BuildingType.House => Color.FromRgb(52, 152, 219),
-            BuildingType.Habitat => Color.FromRgb(39, 174, 96),
-            BuildingType.StaffFacility => Color.FromRgb(142, 68, 173),
-            BuildingType.Plant => Color.FromRgb(46, 125, 50),
-            BuildingType.Decoration => Color.FromRgb(189, 195, 199),
-            _ => Color.FromRgb(brightness, brightness, brightness)
+            "entrance" => Color.FromRgb(46, 204, 113),
+            "exit" => Color.FromRgb(155, 89, 182),
+            "shop" => Color.FromRgb(241, 196, 15),
+            "restaurant" => Color.FromRgb(230, 126, 34),
+            "attraction" => Color.FromRgb(231, 76, 60),
+            "road" => Color.FromRgb(149, 165, 166),
+            "habitat" => Color.FromRgb(39, 174, 96),
+            "stafffacility" => Color.FromRgb(142, 68, 173),
+            "harvestpoint" => Color.FromRgb(46, 125, 50),
+            "feedpoint" => Color.FromRgb(46, 125, 50),
+            "servepoint" => Color.FromRgb(142, 68, 173),
+            _ => Color.FromRgb(189, 195, 199)
         };
     }
 

@@ -9,9 +9,13 @@ public class FeedTask : EmployeeTaskBase
 {
     public string AnimalType { get; set; } = string.Empty;
 
-    public FeedTask(Vector2 position, float duration = 3f)
+    public FeedTask()
     {
         Type = "Feed";
+    }
+
+    public FeedTask(Vector2 position, float duration = 3f) : this()
+    {
         TargetPosition = position;
         Duration = duration;
     }

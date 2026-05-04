@@ -1,34 +1,27 @@
-using GPGems.AI.Decision.Integration;
+// =============================================================
+// 1. Using 指令（必须最前）
+// =============================================================
+using GPGems.Core;
+using GPGems.Core.PipelineHub;
+using GPGems.TestConsole;
 
-Console.WriteLine("=== 融合决策系统快速测试 ===\n");
+// =============================================================
+// 2. 顶级语句（主程序入口，必须在类型声明之前）
+// =============================================================
 
-var npc = new SmartNpc("小明");
+Console.WriteLine("=== CommunicationBus 通讯总线测试 ===\n");
 
-Console.WriteLine($"NPC: {npc.Name}");
-Console.WriteLine($"初始 FSM 状态: {npc.CurrentState}");
-Console.WriteLine($"行为树: {npc.CurrentBehaviorTree?.Name ?? "None"}");
-Console.WriteLine($"效用动作数: {npc.UtilityReasoner.Actions.Count}");
-Console.WriteLine($"GOAP 动作数: {npc.GoapAgent.Actions.Count}");
-Console.WriteLine($"GOAP 目标数: {npc.GoapAgent.Goals.Count}");
-Console.WriteLine();
+CommunicationBusTests.RunAllTests();
 
-Console.WriteLine("运行 20 帧模拟...\n");
+Console.WriteLine("\n=== Pipeline 管线框架测试 ===\n");
 
-for (var i = 0; i < 20; i++)
-{
-    npc.Update(1f);
+// 测试 1: 建筑放置管线（展示 PushChannel 积累-批量处理模式
+PipelineDemo.RunBuildingPlacementDemo();
 
-    var hour = npc.Blackboard.GetOrDefault("hour_of_day", 0f);
-    var energy = npc.Blackboard.GetOrDefault("energy", 0f);
-    var hunger = npc.Blackboard.GetOrDefault("hunger", 0f);
-    var stress = npc.Blackboard.GetOrDefault("stress", 0f);
-    var action = npc.UtilityReasoner.CurrentAction?.Name ?? "None";
+// 测试 2: 互斥分支管线（展示 EventChannel
+PipelineDemo.RunMutexBranchDemo();
 
-    Console.WriteLine($"Frame {i,2}: Time={hour:F1}, State={npc.CurrentState,-15}, " +
-                      $"Energy={energy:F0}, Hunger={hunger:F0}, Stress={stress:F0}, Action={action}");
-}
+// 测试 3: 子管线（节点原生能力
+PipelineDemo.RunSubPipelineDemo();
 
-Console.WriteLine("\n=== 效用系统最终得分 ===");
-Console.WriteLine(npc.UtilityReasoner.GetDebugInfo());
-
-Console.WriteLine("\n=== 测试成功完成 ===");
+Console.WriteLine("\n=== 所有测试完成 ===");
