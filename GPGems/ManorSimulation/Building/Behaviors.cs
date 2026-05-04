@@ -1,3 +1,5 @@
+using GPGems.Core;
+
 namespace GPGems.ManorSimulation.Building;
 
 #region 行为数据类（存储状态）
@@ -11,7 +13,7 @@ public class BehaviorData
 }
 
 /// <summary>
-/// 无状态行为数据（用于没有状态的行为�?/// </summary>
+/// 无状态行为数据（用于没有状态的行为�?/// </summary>
 public sealed class EmptyBehaviorData : BehaviorData
 {
     public static readonly EmptyBehaviorData Instance = new();
@@ -59,7 +61,7 @@ public class ProduceBehaviorData : BehaviorData
 
 #endregion
 
-#region 无状态行为类（纯逻辑，可享元�?
+#region 无状态行为类（纯逻辑，可享元�?
 /// <summary>
 /// 选择行为（无状态，可享元）
 /// </summary>
@@ -138,7 +140,7 @@ public class RotateBehavior : IBehavior
 {
     public string Name => "Rotate";
 
-    public BehaviorData CreateData() => EmptyBehaviorData.Instance; // 无额外状�?
+    public BehaviorData CreateData() => EmptyBehaviorData.Instance; // 无额外状�?
     public void OnInitialize(IBuildingUnit building, BehaviorData data)
     {
     }
@@ -174,7 +176,7 @@ public class PlaceBehavior : IBehavior
 {
     public string Name => "Place";
 
-    public BehaviorData CreateData() => EmptyBehaviorData.Instance; // 无额外状�?
+    public BehaviorData CreateData() => EmptyBehaviorData.Instance; // 无额外状�?
     public void OnInitialize(IBuildingUnit building, BehaviorData data)
     {
         CommunicationBus.Instance.AddQueryDelegate(
@@ -208,7 +210,7 @@ public class StoreBehavior : IBehavior
 {
     public string Name => "Store";
 
-    public BehaviorData CreateData() => EmptyBehaviorData.Instance; // 无额外状�?
+    public BehaviorData CreateData() => EmptyBehaviorData.Instance; // 无额外状�?
     public void OnInitialize(IBuildingUnit building, BehaviorData data)
     {
     }
@@ -235,7 +237,7 @@ public class SellBehavior : IBehavior
 {
     public string Name => "Sell";
 
-    public BehaviorData CreateData() => EmptyBehaviorData.Instance; // 无额外状�?
+    public BehaviorData CreateData() => EmptyBehaviorData.Instance; // 无额外状�?
     public void OnInitialize(IBuildingUnit building, BehaviorData data)
     {
         CommunicationBus.Instance.AddQueryDelegate(

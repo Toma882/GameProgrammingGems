@@ -25,8 +25,8 @@ public class EmployeeManager
 
         // 注册查询处理器
         var bus = CommunicationBus.Instance;
-        bus.RegisterQueryHandler(ManorQueries.GetIdleEmployees, _ => GetIdleEmployees());
-        bus.RegisterQueryHandler(ManorQueries.GetEmployeeById, id => id is int employeeId ? GetEmployee(employeeId) : null);
+        bus.AddQueryDelegate(this, ManorQueries.GetIdleEmployees, _ => GetIdleEmployees());
+        bus.AddQueryDelegate(this, ManorQueries.GetEmployeeById, args => args.FirstOrDefault() is int employeeId ? GetEmployee(employeeId) : null);
 
         // 订阅任务生成事件
         bus.Subscribe(ManorEvents.TaskGenerated, OnTaskGenerated);
@@ -215,23 +215,6 @@ public class EmployeeStateChangedEvent
         EmployeeId = employeeId;
         OldState = oldState;
         NewState = newState;
-    }
-}
-
-/// <summary>
-/// 任务分配事件参数
-/// </summary>
-public class TaskAssignedEvent
-{
-    public int EmployeeId { get; }
-    public int? BuildingId { get; }
-    public EmployeeTaskBase Task { get; }
-
-    public TaskAssignedEvent(int employeeId, int? buildingId, EmployeeTaskBase task)
-    {
-        EmployeeId = employeeId;
-        BuildingId = buildingId;
-        Task = task;
     }
 }
 

@@ -29,7 +29,7 @@ public class ScoredAssignmentStrategy : IWorkerAssignmentStrategy
 
     public int? AssignWorker(EmployeeTaskBase task, List<int> assignedEmployees)
     {
-        var idleWorkers = CommunicationBus.Instance.Query<IEnumerable<EmployeeData>>(ManorQueries.GetIdleEmployees);
+        var idleWorkers = CommunicationBus.Instance.QueryData<IEnumerable<EmployeeData>>(null, ManorQueries.GetIdleEmployees);
         if (idleWorkers == null)
             return null;
 

@@ -20,6 +20,7 @@ using System.Numerics;
 using GPGems.Core;
 using GPGems.Core.Math;
 using GPGems.Core.TaskSystem;
+using GPGems.ManorSimulation.Building;
 using TaskScheduler = GPGems.Core.TaskSystem.TaskScheduler;
 
 namespace GPGems.ManorSimulation
@@ -42,8 +43,8 @@ namespace GPGems.ManorSimulation
 
             // 注册建筑查询处理器
             var bus = CommunicationBus.Instance;
-            bus.RegisterQueryHandler(ManorQueries.GetBuildingById, id =>
-                id is int buildingId ? BuildingManager.GetBuilding(buildingId) : null);
+            bus.AddQueryDelegate(BuildingManager, ManorQueries.GetBuildingById, args =>
+                args.FirstOrDefault() is int buildingId ? BuildingManager.GetBuilding(buildingId) : null);
         }
 
         #endregion
@@ -91,10 +92,6 @@ namespace GPGems.ManorSimulation
                 if (task.EmployeeId >= 0)
                 {
                     EmployeeManager.CompleteTask(task.EmployeeId);
-                    if (task.BuildingId.HasValue)
-                    {
-                        BuildingManager.RemoveEmployeeFromBuilding(task.BuildingId.Value, task.EmployeeId);
-                    }
                 }
             }
         }
