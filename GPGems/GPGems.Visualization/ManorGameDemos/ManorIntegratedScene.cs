@@ -5,7 +5,6 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using GPGems.ManorSimulation;
-using GPGems.ManorSimulation.Placement;
 using GPGems.AI.Boids;
 using System.Numerics;
 using GPGems.Core.Math;

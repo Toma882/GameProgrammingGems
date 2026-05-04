@@ -1,6 +1,6 @@
 using GPGems.Core.TaskSystem;
 
-namespace GPGames.ManorSimulation;
+namespace GPGems.ManorSimulation;
 
 /// <summary>
 /// 员工任务关系提供者

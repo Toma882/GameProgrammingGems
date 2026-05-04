@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using GPGems.AI.Pathfinding;
 
-namespace GPGems.ManorSimulation.Placement;
+namespace GPGems.ManorSimulation;
 
 /// <summary>
 /// 多层网格地图 - 三层楼实现

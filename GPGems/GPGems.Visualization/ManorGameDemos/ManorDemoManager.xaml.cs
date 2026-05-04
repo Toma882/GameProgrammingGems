@@ -7,7 +7,7 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using System.Numerics;
 using GPGems.Core.Math;
-using GPGems.ManorSimulation.Placement;
+using GPGems.ManorSimulation;
 
 namespace GPGems.Visualization.ManorGameDemos
 {

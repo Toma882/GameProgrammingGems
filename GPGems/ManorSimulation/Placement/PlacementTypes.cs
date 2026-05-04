@@ -1,7 +1,7 @@
 
 using GPGems.AI;
 
-namespace GPGems.ManorSimulation.Placement;
+namespace GPGems.ManorSimulation;
 
 /// <summary>
 /// 地图图层类型

@@ -1,6 +1,6 @@
 using System.Numerics;
 
-namespace GPGames.ManorSimulation;
+namespace GPGems.ManorSimulation;
 
 /// <summary>
 /// 收获任务

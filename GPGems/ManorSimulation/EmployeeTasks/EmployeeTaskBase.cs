@@ -1,7 +1,7 @@
 using System.Numerics;
 using GPGems.Core.TaskSystem;
 
-namespace GPGames.ManorSimulation;
+namespace GPGems.ManorSimulation;
 
 /// <summary>
 /// 员工任务基类
