@@ -1,7 +1,8 @@
 using System;
 using System.Collections.Generic;
+using GPGems.AI;
 
-namespace GPGems.AI.ManorSimulation.Placement;
+namespace GPGems.ManorSimulation.Placement;
 
 /// <summary>
 /// 建筑物占位定义

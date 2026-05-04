@@ -1,5 +1,5 @@
 using System.Windows.Media;
-using GPGems.AI.ManorSimulation.Placement;
+using GPGems.ManorSimulation.Placement;
 
 namespace GPGems.Visualization.ManorGameDemos;
 

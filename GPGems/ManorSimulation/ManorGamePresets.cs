@@ -4,11 +4,11 @@
  */
 
 using GPGems.AI.Boids;
-using GPGems.AI.ManorSimulation.Placement;
+using GPGems.ManorSimulation.Placement;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace GPGems.AI.ManorSimulation;
+namespace GPGems.ManorSimulation;
 
 /// <summary>
 /// 庄园游戏中各种群体行为和建筑的预设配置（享元模式）

@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using GPGems.AI.ManorSimulation;
+using GPGems.ManorSimulation;
 using System.Numerics;
 using GPGems.Core.Math;
 
