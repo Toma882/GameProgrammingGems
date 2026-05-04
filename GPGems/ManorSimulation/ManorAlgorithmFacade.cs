@@ -16,7 +16,6 @@ using System.Collections.Generic;
 using GPGems.AI.Pathfinding;
 using GPGems.AI.CollisionAvoidance;
 using GPGems.AI.Boids;
-using GPGems.ManorSimulation;
 using System.Numerics;
 using GPGems.Core.Math;
 

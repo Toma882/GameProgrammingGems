@@ -15,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GPGems.Core\GPGems.Core.csproj" />
     <ProjectReference Include="..\GPGems.AI\GPGems.AI.csproj" />
+    <ProjectReference Include="..\ManorSimulation\GPGems.ManorSimulation.csproj" />
     <ProjectReference Include="..\GPGems.GeneralProgramming\GPGems.GeneralProgramming.csproj" />
     <ProjectReference Include="..\GPGems.MathPhysics\GPGems.MathPhysics.csproj" />
     <ProjectReference Include="..\GPGems.Graphics\GPGems.Graphics.csproj" />

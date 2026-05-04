@@ -4,7 +4,6 @@
  */
 
 using GPGems.AI.Boids;
-using GPGems.ManorSimulation;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 

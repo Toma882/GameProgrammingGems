@@ -48,9 +48,9 @@ public class EmployeeTaskRelationProvider : ITaskRelationProvider
     /// </summary>
     public void RegisterToScheduler()
     {
-        TaskScheduler.Instance.RegisterRelationProvider(typeof(EmployeeTaskBase), this);
-        TaskScheduler.Instance.RegisterRelationProvider(typeof(HarvestTask), this);
-        TaskScheduler.Instance.RegisterRelationProvider(typeof(FeedTask), this);
-        TaskScheduler.Instance.RegisterRelationProvider(typeof(ServeTask), this);
+        Core.TaskSystem.TaskScheduler.Instance.RegisterRelationProvider(typeof(EmployeeTaskBase), this);
+        Core.TaskSystem.TaskScheduler.Instance.RegisterRelationProvider(typeof(HarvestTask), this);
+        Core.TaskSystem.TaskScheduler.Instance.RegisterRelationProvider(typeof(FeedTask), this);
+        Core.TaskSystem.TaskScheduler.Instance.RegisterRelationProvider(typeof(ServeTask), this);
     }
 }
