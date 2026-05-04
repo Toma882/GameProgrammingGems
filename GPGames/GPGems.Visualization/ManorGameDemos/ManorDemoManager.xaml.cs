@@ -246,17 +246,7 @@ namespace GPGems.Visualization.ManorGameDemos
 
         private void RenderCanvas_MouseLeftButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
-            var pos = e.GetPosition(RenderCanvas);
-            var (gx, gy) = _placementScene.ScreenToGrid(pos.X, pos.Y);
-            _placementScene.PreviewX = gx;
-            _placementScene.PreviewY = gy;
-
-            int id = _placementScene.PlaceCurrent();
-            if (id > 0)
-            {
-                StatsCollisions.Text = $"本层建筑: {_placementScene.GetStat("")}";
-            }
-            Render();
+            BtnIntPlace_Click(sender, e);
         }
 
         private void RenderCanvas_MouseRightButtonDown(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -352,8 +342,6 @@ namespace GPGems.Visualization.ManorGameDemos
 
         private void IntegratedScene_MouseMove(object sender, System.Windows.Input.MouseEventArgs e)
         {
-            if (_integratedScene.IsSimulating) return;
-
             var pos = e.GetPosition(RenderCanvas);
             var (gx, gy) = _integratedScene.ScreenToGrid(pos.X, pos.Y);
             _integratedScene.PreviewX = gx;

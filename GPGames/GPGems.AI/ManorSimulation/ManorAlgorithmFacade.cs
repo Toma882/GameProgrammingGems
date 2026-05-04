@@ -533,6 +533,32 @@ namespace GPGems.AI.ManorSimulation
             });
         }
 
+        /// <summary>
+        /// 移除指定位置的任务
+        /// </summary>
+        public void RemoveTaskAt(Vector2 position)
+        {
+            var task = _tasks.FirstOrDefault(t =>
+                Math.Abs(t.Position.X - position.X) < 0.1f &&
+                Math.Abs(t.Position.Y - position.Y) < 0.1f);
+
+            if (task != null)
+            {
+                // 如果任务已分配给员工，重置该员工状态
+                if (task.AssignedEmployeeId >= 0)
+                {
+                    var emp = _employees.FirstOrDefault(e => e.Id == task.AssignedEmployeeId);
+                    if (emp != null)
+                    {
+                        emp.State = EmployeeState.Idle;
+                        emp.CurrentTask = null;
+                        emp.CurrentPath.Clear();
+                    }
+                }
+                _tasks.Remove(task);
+            }
+        }
+
         public void Update(float deltaTime)
         {
             // 1. 分配空闲员工到未分配任务

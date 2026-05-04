@@ -29,6 +29,11 @@ public static class ManorGamePresets
     private static readonly BuildingFootprint _shop;
     private static readonly BuildingFootprint _restaurant;
     private static readonly BuildingFootprint _road;
+    // 员工设施预设
+    private static readonly BuildingFootprint _staffDorm;
+    private static readonly BuildingFootprint _harvestPoint;
+    private static readonly BuildingFootprint _feedPoint;
+    private static readonly BuildingFootprint _servePoint;
 
     // 自定义参数享元池 - 根据关键参数组合缓存
     private static readonly Dictionary<(float cohesion, float alignment, float separation), BoidSettings>
@@ -84,9 +89,14 @@ public static class ManorGamePresets
         _shop = CreateShop();
         _restaurant = CreateRestaurant();
         _road = CreateRoad();
+        _staffDorm = CreateStaffDorm();
+        _harvestPoint = CreateHarvestPoint();
+        _feedPoint = CreateFeedPoint();
+        _servePoint = CreateServePoint();
 
         IntegratedSceneBuildings = new List<BuildingFootprint>
-            { _entrance, _exit, _attraction, _shop, _restaurant, _road }
+            { _entrance, _exit, _attraction, _shop, _restaurant, _road,
+              _staffDorm, _harvestPoint, _feedPoint, _servePoint }
             .AsReadOnly();
     }
 
@@ -131,6 +141,18 @@ public static class ManorGamePresets
 
     private static BuildingFootprint CreateRoad() =>
         new BuildingFootprint(BuildingType.Road, 2, 1) { BlocksMovement = false, FloorCount = 0 };
+
+    private static BuildingFootprint CreateStaffDorm() =>
+        new BuildingFootprint(BuildingType.StaffFacility, 4, 4) { BlocksMovement = true, FloorCount = 2 };
+
+    private static BuildingFootprint CreateHarvestPoint() =>
+        new BuildingFootprint(BuildingType.StaffFacility, 2, 2) { BlocksMovement = false, FloorCount = 1 };
+
+    private static BuildingFootprint CreateFeedPoint() =>
+        new BuildingFootprint(BuildingType.StaffFacility, 2, 2) { BlocksMovement = false, FloorCount = 1 };
+
+    private static BuildingFootprint CreateServePoint() =>
+        new BuildingFootprint(BuildingType.StaffFacility, 2, 2) { BlocksMovement = false, FloorCount = 1 };
 
     private static BoidSettings CreateFishSchool() => new()
     {

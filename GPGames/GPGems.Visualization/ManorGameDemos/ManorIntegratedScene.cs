@@ -38,6 +38,9 @@ public class ManorIntegratedScene : IDemoScene
     private EmployeeTaskSystem? _employeeSystem;
     private EvacuationSystem? _evacuationSystem;
 
+    // 建筑-任务关联映射 (建筑ID -> 任务位置)
+    private readonly Dictionary<int, Vector2> _buildingTaskMap = new();
+
     // 系统开关
     public bool EnableVisitorFlow { get; set; } = true;
     public bool EnableAnimalGroup { get; set; } = false;
@@ -137,7 +140,36 @@ public class ManorIntegratedScene : IDemoScene
             return 0;
 
         var facade = ManorAlgorithmFacade.Instance;
-        return facade.PlaceObject(_selectedBuilding, _previewX, _previewY, _currentFloor);
+        int buildingId = facade.PlaceObject(_selectedBuilding, _previewX, _previewY, _currentFloor);
+
+        // 如果是员工设施，放置后自动添加任务点
+        if (buildingId > 0 && _selectedBuilding.Type == BuildingType.StaffFacility)
+        {
+            var taskPos = new Vector2(_previewX, _previewY);
+            _employeeSystem?.AddTask(
+                GetTaskTypeForBuilding(_selectedBuilding),
+                taskPos,
+                3.0f);
+
+            _buildingTaskMap[buildingId] = taskPos;
+        }
+
+        return buildingId;
+    }
+
+    private static string GetTaskTypeForBuilding(BuildingFootprint footprint)
+    {
+        // 根据预设索引区分任务类型
+        var presets = ManorGamePresets.IntegratedSceneBuildings;
+        int index = presets.IndexOf(footprint);
+        return index switch
+        {
+            6 => "Rest",      // StaffDorm - 休息
+            7 => "Harvest",   // HarvestPoint - 收获
+            8 => "Feed",      // FeedPoint - 喂养
+            9 => "Serve",     // ServePoint - 服务
+            _ => "Work"
+        };
     }
 
     public bool RemoveAt(int worldX, int worldY)
@@ -146,6 +178,14 @@ public class ManorIntegratedScene : IDemoScene
         var obj = facade.GetObjectAt(worldX, worldY, _currentFloor);
         if (obj == null)
             return false;
+
+        // 如果是员工设施，移除前先删除对应任务点
+        if (obj.Footprint.Type == BuildingType.StaffFacility &&
+            _buildingTaskMap.TryGetValue(obj.Id, out var taskPos))
+        {
+            _employeeSystem?.RemoveTaskAt(taskPos);
+            _buildingTaskMap.Remove(obj.Id);
+        }
 
         return facade.RemoveObject(obj.Id);
     }
@@ -427,9 +467,38 @@ public class ManorIntegratedScene : IDemoScene
             }
         }
 
-        // 渲染员工
+        // 渲染员工任务点
         if (_employeeSystem != null)
         {
+            foreach (var task in _employeeSystem.Tasks)
+            {
+                var (sx, sy) = GridToScreen((int)task.Position.X, (int)task.Position.Y, 0);
+
+                // 根据任务类型选择颜色
+                Color taskColor = task.Type switch
+                {
+                    "Rest" => Color.FromRgb(128, 128, 255),    // 蓝色 - 休息
+                    "Harvest" => Color.FromRgb(50, 205, 50),   // 绿色 - 收获
+                    "Feed" => Color.FromRgb(255, 215, 0),      // 金色 - 喂养
+                    "Serve" => Color.FromRgb(30, 144, 255),    // 深天蓝 - 服务
+                    _ => Color.FromRgb(128, 128, 128)           // 灰色 - 默认
+                };
+
+                var ellipse = new Ellipse
+                {
+                    Width = 10,
+                    Height = 10,
+                    Fill = new SolidColorBrush(taskColor),
+                    Stroke = new SolidColorBrush(Colors.White),
+                    StrokeThickness = 1
+                };
+                Canvas.SetLeft(ellipse, sx - 5);
+                Canvas.SetTop(ellipse, sy - 5);
+                canvas.Children.Add(ellipse);
+                cache.Add(ellipse);
+            }
+
+            // 渲染员工
             foreach (var emp in _employeeSystem.Employees)
             {
                 var (sx, sy) = GridToScreen((int)emp.Position.X, (int)emp.Position.Y, 0);
